@@ -1,0 +1,183 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout :: layout(title='Dashboard', content=~{::section})} "
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <section>
+      <div class="bg-white rounded shadow p-4">
+        <h2 class="display-6 fw-light text-secondary mb-4">
+          Bienvenido de nuevo,
+          <span class="fw-bold text-primary" th:text="${nombreCliente}"
+            >Usuario
+          </span>
+        </h2>
+
+        <div class="row mb-5">
+          <div class="col-md-6">
+            <!-- Tarjeta de saldo -->
+            <div
+              class="bg-primary bg bg-gradient rounded p-4 text-white shadow"
+            >
+              <h3 class="h6 text-uppercase text-white-50 tracking-wider mb-2">
+                Cuenta de debito principal
+              </h3>
+              <p class="display-5 fw-bold mb-3">
+                $
+                <span
+                  th:text="${#numbers.formatDecimal(saldoTotal, 1, 'COMMA',2,'POINT')}"
+                  >0.00</span
+                >MXN
+              </p>
+              <p
+                class="small text-white-50 font-monospace mb-0"
+                th:text="'CLABE:'+${cuentaClabe}"
+              >
+                CLABE: 1234567890
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA DE MOVIMIENTOS RECENTES -->
+        <h3 class="h5 fw-bold text-dark mb-3">
+          <i class="bi bi-clock-history me-2"></i>Movimientos recientes
+        </h3>
+        <div class="table-responsive">
+          <table class="table table-hover bordered bg-white align-middle">
+            <thead class="table-light">
+              <tr>
+                <th class="text-center">Fecha</th>
+                <th>Descripción</th>
+                <th class="text-end">Monto</th>
+                <th class="text-center">Tipo</th>
+                <th class="text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!--bucle con thymeleaf  -->
+              <tr th:each="movimiento : ${movimientos}">
+                <td class="text-center celda-fecha" th:text="${#temporals.format(movimiento.fecha,'dd/MM/yyyy')}">01/01/2000</td>
+                <td th:text="${movimiento.descripcion}">Concepto del movimiento</td>
+                <td class="text-end fw-bold"
+                th:classappend="${movimiento.cuentaDestino == cuentaClabe} ? 'text-success' : 'text-danger'"
+                th:text="${movimiento.cuentaDestino == cuentaClabe ? '+$' : '-$'} + ${#numbers.formatDecimal(movimiento.monto, 1, 'COMMA', 2, 'POINT')}"
+                >$0.00</td>
+                <td class="text-center">
+                  <span
+                    class="badge"
+                    th:classappend="${movimiento.tipo == 'Deposito'} ? 'badge-deposito' : 'badge-transferencia'"
+                  >
+                    <i
+                      class="bi"
+                      th:classappend="${movimiento.tipo == 'Deposito'} ? 'bi-piggy-bank' : 'bi-arrow-left-right'"
+                    ></i>
+                    <span th:text="${movimiento.tipo}">Deposito</span>
+                  </span>
+                </td>
+                <td class="text-center">
+                  <span
+                    class="badge rounded-pill d-inline-flex align-items-center gap-1"
+                    th:classappend="${movimiento.estadoMovimiento == 'AUTORIZADO'} ? 'bg-success' : (${movimiento.estadoMovimiento == 'CANCELADO'} ? 'bg-danger' : 'bg-warning text-dark')"
+                  >
+                    <i
+                      class="bi"
+                      th:classappend="${movimiento.estadoMovimiento == 'AUTORIZADO'} ? 'bi-check-circle-fill' : (${movimiento.estadoMovimiento == 'CANCELADO'} ? 'bi-x-circle-fill' : 'bi-hourglass-split')"
+                    ></i>
+                    <span th:text="${movimiento.estadoMovimiento}">PENDIENTE</span>
+                  </span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(movimientos)}">
+                <td class="text-center text-muted" colspan="5">
+                  Aún no tienes movimientos registrados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- GRAFICA COMPARATIVA DE INGRESOS Y GASTOS -->
+         <div class="row mt-4">
+          <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0 p-3">
+              <h3 class="h6 fw-bold text-dark mb-3">Comparativo de ingresos y gastos por mes</h3>
+              <div style="position: relative; height: 220px">
+                <canvas id="graficaComparativo"></canvas>
+              </div>
+            </div>
+          </div>
+         </div>
+
+         <!-- Script para generar la grafica comparativa -->
+         <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            fetch("/api/v1/finanzas/resumen-mensual")
+              .then(response => {
+                if (!response.ok)
+                  throw new Error("Error en la Red al obtener el resumen mensual");
+
+                return response.json();
+              })
+              .then(datosJson => {
+                //mapeo de los datos Json para la pagina
+                const etiquetas = datosJson.map(item => item.mes);
+                const ingresos = datosJson.map(item => item.ingresos);
+                const gastos = datosJson.map(item => item.gastos);
+
+                const ctx = document.getElementById("graficaComparativo").getContext('2d');
+                new Chart(
+                  ctx, {
+                    type: 'bar',
+                    data: {
+                      labels: etiquetas,
+                      datasets: [
+                        {
+                          label: 'Ingresos',
+                          data: ingresos,
+                          backgroundColor: '#2ECC71'
+                        },
+                        {
+                          label: 'Gastos',
+                          data: gastos,
+                          backgroundColor: '#E74C3C'
+                        }
+                      ]
+                    },
+                    options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                        y: {
+                          beginAtZero: true
+                        }
+                      },
+                      plugins: {
+                        legend: { position: 'top' }
+                      }
+                    }
+                  }
+                );
+
+              })
+
+          });
+         </script>
+
+
+
+
+
+      </div>
+    </section>
+
+
+
+  </body>
+</html>

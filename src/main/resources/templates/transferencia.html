@@ -1,0 +1,194 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://wwww.thymeleaft.org"
+  th:replace="~{layout::layout('Nueva Transferencia',
+  ~{::section})}"
+>
+  <head> </head>
+  <body>
+    <section>
+      <!-- Encabezado de la seccion -->
+      <div
+        class="bg-white rounded shadow p-4 mb-4 d-flex align-items-center gap-3"
+      >
+        <div class="icono-circulo icono-circulo-azul">
+          <i class="bi bi-arrow-left-right"></i>
+        </div>
+        <div>
+          <h2 class="h4 fw-bold mb-1">Nueva Transferencia</h2>
+          <p class="text-secondary mb-0">
+            Envía dinero de forma segura e inmediata a cualquier cuenta CLABE
+          </p>
+        </div>
+      </div>
+
+      <div
+        th:if="${param.error}"
+        class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div th:text="${param.error}">Error en la operación</div>
+      </div>
+
+      <div
+        th:if="${param.exito}"
+        class="alert alert-success d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-check-circle-fill"></i>
+        <div th:text="${param.exito}">Transferencia realizada con éxito</div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Formulario de transferencia -->
+        <div class="col-12 col-lg-7">
+          <div class="card card-glassmorphic border-0 shadow-lg p-4 p-md-5">
+            <h4 class="h5 fw-bold text-white mb-4">
+              <i class="fa-solid fa-paper-plane text-primary me-2"></i>
+              Datos de la Transferencia
+            </h4>
+            <form th:action="@{/procesar-transferencia}" method="POST">
+              <!-- CLABE Destino -->
+              <div class="mb-4">
+                <label
+                  for="clabeDestino"
+                  class="form-label text-light fw-medium mb-2"
+                  >CLABE Destino (18 dígitos)</label
+                >
+                <div class="input-group-custom">
+                  <span class="input-icon"
+                    ><i class="fa-solid fa-building-columns text-primary-accent"></i
+                  ></span>
+                  <input
+                    type="text"
+                    id="clabeDestino"
+                    name="clabeDestino"
+                    class="form-control-custom font-monospace"
+                    placeholder="Ej. 012345678901234567"
+                    pattern="\d{18}"
+                    maxlength="18"
+                    inputmode="numeric"
+                    required
+                  />
+                </div>
+                <div class="form-text text-secondary small mt-1">
+                  Verifica que la CLABE pertenezca al beneficiario correcto.
+                </div>
+              </div>
+
+              <!-- Monto -->
+              <div class="mb-4">
+                <label for="monto" class="form-label text-light fw-medium mb-2"
+                  >Monto a Transferir ($)</label
+                >
+                <div class="input-group-custom">
+                  <span class="input-icon"
+                    ><i class="fa-solid fa-sack-dollar text-success"></i
+                  ></span>
+                  <input
+                    type="number"
+                    id="monto"
+                    name="monto"
+                    class="form-control-custom fw-bold"
+                    placeholder="Ej. 1500.00"
+                    step="0.01"
+                    min="1"
+                    required
+                  />
+                </div>
+                <div class="form-text text-secondary small mt-1">
+                  El monto se descontará de inmediato de tu saldo disponible.
+                </div>
+              </div>
+
+              <!-- Concepto -->
+              <div class="mb-4">
+                <label
+                  for="descripcion"
+                  class="form-label text-light fw-medium mb-2"
+                  >Concepto (opcional)</label
+                >
+                <input
+                  type="text"
+                  id="descripcion"
+                  name="descripcion"
+                  class="form-control"
+                  placeholder="Ej. Pago de renta"
+                  maxlength="120"
+                />
+              </div>
+
+              <!-- Aviso de seguridad -->
+              <div
+                class="alert alert-info d-flex align-items-start gap-2 small mb-4"
+              >
+                <i class="bi bi-shield-lock-fill mt-1"></i>
+                <div>
+                  Las transferencias entre cuentas CLABE son inmediatas e
+                  irreversibles. Verifica los datos antes de continuar.
+                </div>
+              </div>
+
+              <!-- Boton de envio -->
+              <div class="d-grid mt-4">
+                <button
+                  type="submit"
+                  class="btn btn-primary-accent rounded-pill py-2 fw-bold"
+                >
+                  <i class="bi bi-send-fill me-2"></i> Enviar Transferencia
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel de recomendaciones -->
+        <div class="col-12 col-lg-5">
+          <div
+            class="card card-glassmorphic border-0 shadow-lg p-4 h-100 d-flex flex-column"
+          >
+            <h4 class="h5 fw-bold text-white mb-4">
+              <i class="fa-solid fa-circle-info text-gradient me-2"></i>
+              Recomendaciones de Seguridad
+            </h4>
+            <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
+              <li class="d-flex align-items-start gap-3">
+                <span class="icono-circulo icono-circulo-verde flex-shrink-0"
+                  style="width: 38px; height: 38px; font-size: 1rem"
+                >
+                  <i class="bi bi-shield-check"></i>
+                </span>
+                <span class="text-secondary small"
+                  >Confirma siempre la CLABE y el nombre del beneficiario
+                  antes de enviar.</span
+                >
+              </li>
+              <li class="d-flex align-items-start gap-3">
+                <span class="icono-circulo icono-circulo-azul flex-shrink-0"
+                  style="width: 38px; height: 38px; font-size: 1rem"
+                >
+                  <i class="bi bi-lightning-charge-fill"></i>
+                </span>
+                <span class="text-secondary small"
+                  >Las transferencias a cuentas CLABE se aplican de forma
+                  inmediata.</span
+                >
+              </li>
+              <li class="d-flex align-items-start gap-3">
+                <span class="icono-circulo icono-circulo-rojo flex-shrink-0"
+                  style="width: 38px; height: 38px; font-size: 1rem"
+                >
+                  <i class="bi bi-eye-slash-fill"></i>
+                </span>
+                <span class="text-secondary small"
+                  >Nunca compartas tus contraseñas ni códigos de
+                  verificación con terceros.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

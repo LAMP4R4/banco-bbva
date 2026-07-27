@@ -1,0 +1,215 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout::layout('Administracion de Movimientos',
+  ~{::section})}"
+>
+  <body>
+    <section>
+      <div
+        th:if="${param.error}"
+        class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div th:text="${param.error}">Error en la solicitud</div>
+      </div>
+
+      <div
+        th:if="${param.exito}"
+        class="alert alert-success d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-check-circle-fill"></i>
+        <div th:text="${param.exito}">Operación completada con éxito</div>
+      </div>
+
+      <div
+        class="bg-white rounded shadow p-4 mb-4 d-flex align-items-center gap-3"
+      >
+        <div class="icono-circulo icono-circulo-azul">
+          <i class="bi bi-cash-coin"></i>
+        </div>
+        <div>
+          <h2 class="h4 fw-bold mb-1">Movimientos de Clientes</h2>
+          <p class="text-secondary mb-0">
+            Gestion, autorizacion y control de movimientos de la cartera de
+            clientes
+          </p>
+        </div>
+      </div>
+
+      <!--tabla de movimientos-->
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="bg-white rounded shadow p-4 h-100">
+            <h3 class="h5 fw-bold text-dark mb-4">
+              <i class="bi bi-clock-history me-2"></i>Historial Operativo
+            </h3>
+
+            <div
+              th:if="${#lists.isEmpty(movimientos)}"
+              class="alert alert-success d-flex align-items-center gap-2 mb-0"
+            >
+              <i class="bi bi-check-circle-fill"></i>
+              <div>No hay registros que visualizar</div>
+            </div>
+
+            <div
+              th:if="${not #lists.isEmpty(movimientos)}"
+              class="table-responsive"
+            >
+              <table class="table table-hover bordered bg-white align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col" class="text-center">ID</th>
+                    <th scope="col" class="text-center">Fecha</th>
+                    <th scope="col" class="text-center">
+                      Cuenta Origen / Destino
+                    </th>
+                    <th scope="col" class="text-center">Tipo</th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col" class="text-end">Monto</th>
+                    <th scope="col" class="text-center">Estado</th>
+                    <th scope="col" class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="movimiento : ${movimientos}">
+                    <td class="text-center" th:text="'#' + ${movimiento.id}">#1</td>
+                    <td
+                      class="text-center celda-fecha"
+                      th:text="${#temporals.format(movimiento.fecha,'dd/MM/yyyy')}"
+                    >
+                      00/00/0000
+                    </td>
+                    <td class="text-center">
+                      <div class="d-flex align-items-center justify-content-center gap-1 text-danger celda-cuenta">
+                        <i class="bi bi-box-arrow-up"></i>
+                        <span th:text="${movimiento.cuentaOrigen}">0000000000000000</span>
+                      </div>
+                      <div class="d-flex align-items-center justify-content-center gap-1 text-success celda-cuenta mt-1">
+                        <i class="bi bi-box-arrow-in-down"></i>
+                        <span th:text="${movimiento.cuentaDestino}">0000000000000000</span>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="badge"
+                        th:classappend="${movimiento.tipo == 'Deposito'} ? 'badge-deposito' : 'badge-transferencia'"
+                      >
+                        <i
+                          class="bi"
+                          th:classappend="${movimiento.tipo == 'Deposito'} ? 'bi-piggy-bank' : 'bi-arrow-left-right'"
+                        ></i>
+                        <span th:text="${movimiento.tipo}">Deposito</span>
+                      </span>
+                    </td>
+                    <td th:text="${movimiento.descripcion}">
+                      Concepto del movimiento
+                    </td>
+                    <td
+                      class="text-end fw-bold"
+                      th:classappend="${movimiento.tipo == 'Deposito'} ? 'text-success' : 'text-danger'"
+                      th:text="${(movimiento.tipo == 'Deposito' ? '+$' : '-$')} + ${#numbers.formatDecimal(movimiento.monto, 1, 'COMMA', 2, 'POINT')}"
+                    >
+                      +$0.00
+                    </td>
+                    <td class="text-center">
+                      <span
+                        class="badge rounded-pill d-inline-flex align-items-center gap-1"
+                        th:classappend="${movimiento.estadoMovimiento == 'AUTORIZADO'} ? 'bg-success' : (${movimiento.estadoMovimiento == 'CANCELADO'} ? 'bg-danger' : 'bg-warning text-dark')"
+                      >
+                        <i
+                          class="bi"
+                          th:classappend="${movimiento.estadoMovimiento == 'AUTORIZADO'} ? 'bi-check-circle-fill' : (${movimiento.estadoMovimiento == 'CANCELADO'} ? 'bi-x-circle-fill' : 'bi-hourglass-split')"
+                        ></i>
+                        <span th:text="${movimiento.estadoMovimiento}">PENDIENTE</span>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center gap-2">
+                        <form
+                          th:if="${movimiento.estadoMovimiento!='AUTORIZADO'}"
+                          th:action="@{/admin/movimientos/actualizar-estado}"
+                          method="post"
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            th:value="${movimiento.id}"
+                          />
+                          <input
+                            type="hidden"
+                            name="estado"
+                            th:value="AUTORIZADO"
+                          />
+                          <button
+                            type="submit"
+                            class="btn btn-success rounded shadow-sm"
+                            title="Autorizar"
+                          >
+                            <i class="bi bi-check-lg"></i>
+                          </button>
+                        </form>
+                        <form
+                          th:if="${movimiento.estadoMovimiento!='CANCELADO'}"
+                          th:action="@{/admin/movimientos/actualizar-estado}"
+                          method="post"
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            th:value="${movimiento.id}"
+                          />
+                          <input
+                            type="hidden"
+                            name="estado"
+                            th:value="CANCELADO"
+                          />
+                          <button
+                            type="submit"
+                            class="btn btn-naranja rounded shadow-sm"
+                            title="Cancelar"
+                          >
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                        </form>
+                        <!--Boton de eliminar para implementar en otra cosa tambien se puede hacer uno para editar-->
+
+                        <!--
+                        <form
+                          th:action="@{/admin/movimientos/eliminar}"
+                          method="post"
+                          onsubmit="return confirm('Estas seguro?');"
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            th:value="${movimiento.id}"
+                          />
+                          <input
+                            type="hidden"
+                            name="estado"
+                            th:value="CANCELADO"
+                          />
+                          <button
+                            type="submit"
+                            class="btn btn-danger rounded shadow-sm"
+                            title="Eliminar"
+                          >
+                            <i class="bi bi-trash3"></i>
+                          </button>
+                        </form>
+                        -->
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

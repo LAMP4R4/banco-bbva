@@ -1,0 +1,116 @@
+<!doctype html>
+<!-- Fragmentos Thymeleaf reutilizables para las acciones sobre un cliente
+     (modificar, deshabilitar/habilitar, retener/liberar saldo). Se usan
+     desde admin.html y registro-admin.html, que muestran la misma tabla. -->
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div
+      th:fragment="acciones-cliente(cliente, origen)"
+      class="d-flex flex-wrap justify-content-center gap-1"
+    >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary"
+        data-bs-toggle="modal"
+        th:data-bs-target="'#modalEditarCliente' + ${cliente.id}"
+        title="Modificar cliente"
+      >
+        <i class="bi bi-pencil-square"></i>
+      </button>
+
+      <form
+        th:if="${#lists.isEmpty(cliente.cuentas) or cliente.cuentas[0].estado != 'DESHABILITADA'}"
+        th:action="@{/admin/clientes/{id}/deshabilitar(id=${cliente.id})}"
+        method="POST"
+        class="d-inline"
+      >
+        <input type="hidden" name="origen" th:value="${origen}" />
+        <button type="submit" class="btn btn-sm btn-outline-warning" title="Deshabilitar cliente">
+          <i class="bi bi-slash-circle"></i>
+        </button>
+      </form>
+      <form
+        th:if="${!#lists.isEmpty(cliente.cuentas) and cliente.cuentas[0].estado == 'DESHABILITADA'}"
+        th:action="@{/admin/clientes/{id}/habilitar(id=${cliente.id})}"
+        method="POST"
+        class="d-inline"
+      >
+        <input type="hidden" name="origen" th:value="${origen}" />
+        <button type="submit" class="btn btn-sm btn-outline-success" title="Habilitar cliente">
+          <i class="bi bi-check-circle"></i>
+        </button>
+      </form>
+
+      <form
+        th:if="${!#lists.isEmpty(cliente.cuentas) and cliente.cuentas[0].estado != 'RETENIDA'}"
+        th:action="@{/admin/clientes/{id}/retener-saldo(id=${cliente.id})}"
+        method="POST"
+        class="d-inline"
+      >
+        <input type="hidden" name="origen" th:value="${origen}" />
+        <button type="submit" class="btn btn-sm btn-outline-danger" title="Retener saldo">
+          <i class="bi bi-lock"></i>
+        </button>
+      </form>
+      <form
+        th:if="${!#lists.isEmpty(cliente.cuentas) and cliente.cuentas[0].estado == 'RETENIDA'}"
+        th:action="@{/admin/clientes/{id}/liberar-saldo(id=${cliente.id})}"
+        method="POST"
+        class="d-inline"
+      >
+        <input type="hidden" name="origen" th:value="${origen}" />
+        <button type="submit" class="btn btn-sm btn-outline-success" title="Liberar saldo">
+          <i class="bi bi-unlock"></i>
+        </button>
+      </form>
+    </div>
+
+    <div
+      th:fragment="modal-editar-cliente(cliente, origen)"
+      class="modal fade"
+      th:id="'modalEditarCliente' + ${cliente.id}"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form th:action="@{/admin/clientes/{id}/editar(id=${cliente.id})}" method="POST">
+            <input type="hidden" name="origen" th:value="${origen}" />
+            <div class="modal-header">
+              <h5 class="modal-title">Modificar cliente</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  class="form-control"
+                  th:value="${cliente.nombre}"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nombre de usuario</label>
+                <input
+                  type="text"
+                  name="username"
+                  class="form-control"
+                  th:value="${cliente.userName}"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+              <button type="submit" class="btn-banco">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

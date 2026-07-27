@@ -1,0 +1,171 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout::layout('Registrar Cliente',
+  ~{::section})}"
+>
+  <head></head>
+  <body>
+    <section>
+      <!-- Encabezado de la seccion -->
+      <div
+        class="bg-white rounded shadow p-4 mb-4 d-flex align-items-center gap-3"
+      >
+        <div class="icono-circulo icono-circulo-azul">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div>
+          <h2 class="h4 fw-bold mb-1">Registrar Cliente</h2>
+          <p class="text-secondary mb-0">
+            Gestion de cartera de clientes y apertura de cuentas
+          </p>
+        </div>
+      </div>
+
+      <div
+        th:if="${param.exito}"
+        class="alert alert--custom-success d-flex align-items-center gap-2 mb-4"
+        role="alert"
+      >
+        <i class="fa-solid fa-circle-check fs-5"></i>
+        <div th:text="${param.exito}">Operacion Ejecutada con exito</div>
+      </div>
+
+      <div
+        th:if="${param.error}"
+        class="alert alert--custom-danger d-flex align-items-center gap-2 mb-4"
+        role="alert"
+      >
+        <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+        <div th:text="${param.error}">Error en la operacion</div>
+      </div>
+
+      <!--Formulario de alta de cliente y cartera de clientes activos-->
+      <div class="row g-4">
+        <div class="col-12 col-md-5">
+          <div class="bg-white rounded shadow p-4 h-100">
+            <h3 class="h5 fw-bold text-dark mb-4">
+              <i class="fa-solid fa-user-plus me-2"></i>Registrar nuevo cliente
+            </h3>
+            <form th:action="@{/admin/registro-admin/crear-cliente}" method="POST">
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre de Cliente</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  class="form-control"
+                  placeholder="Ej. Juan Perez"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="username" class="form-label"
+                  >Nombre de usuario</label
+                >
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control"
+                  placeholder="Ej. jperez"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label"
+                  >Contraseña temporal</label
+                >
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <label for="saldoInicial" class="form-label"
+                  >Monto de apertura (saldo inicial)</label
+                >
+                <input
+                  type="number"
+                  id="saldoInicial"
+                  name="saldoInicial"
+                  class="form-control"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-banco w-100">
+                <i class="fa-solid fa-floppy-disk me-1"></i> Registrar cliente
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-7">
+          <div class="bg-white rounded shadow p-4 h-100">
+            <h3 class="h5 fw-bold text-dark mb-4">
+              <i class="fa-solid fa-address-card me-2"></i>Cartera de clientes
+              activos
+            </h3>
+            <div class="table-responsive">
+              <table class="table table-hover bordered bg-white align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center">Usuario</th>
+                    <th class="text-center">CLABE</th>
+                    <th class="text-center">Saldo</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="cliente : ${clientes}">
+                    <td class="text-center" th:text="${cliente.userName}">
+                      usuario
+                    </td>
+                    <td
+                      class="text-center font-monospace"
+                      th:text="${!#lists.isEmpty(cliente.cuentas)} ? ${cliente.cuentas[0].clabe} : '-'"
+                    >
+                      000000000000000000
+                    </td>
+                    <td
+                      class="text-center"
+                      th:text="${!#lists.isEmpty(cliente.cuentas)} ? ${'$' + #numbers.formatDecimal(cliente.cuentas[0].saldo, 1, 'COMMA', 2, 'POINT')} : '-'"
+                    >
+                      $0.00
+                    </td>
+                    <td
+                      class="text-center"
+                      th:text="${!#lists.isEmpty(cliente.cuentas)} ? ${cliente.cuentas[0].estado} : '-'"
+                    >
+                      PENDIENTE
+                    </td>
+                    <td class="text-center" th:insert="~{fragments/cliente-acciones :: acciones-cliente(${cliente}, '/admin/registro-admin')}"></td>
+                  </tr>
+                  <tr th:if="${#lists.isEmpty(clientes)}">
+                    <td class="text-center text-muted" colspan="5">
+                      Aún no hay clientes registrados.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--Modales de edicion de cliente (fuera de la tabla para que el HTML sea valido)-->
+      <th:block th:each="cliente : ${clientes}">
+        <div th:replace="~{fragments/cliente-acciones :: modal-editar-cliente(${cliente}, '/admin/registro-admin')}"></div>
+      </th:block>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout::layout('Panel Ejecutivo',
+  ~{::section})}"
+>
+  <head></head>
+  <body>
+    <section>
+      <!-- Encabezado de la seccion -->
+      <div
+        class="bg-white rounded shadow p-4 mb-4 d-flex align-items-center gap-3"
+      >
+        <div class="icono-circulo icono-circulo-azul">
+          <i class="fa-solid fa-bar-chart"></i>
+        </div>
+        <div>
+          <h2 class="h4 fw-bold mb-1">Panel Ejecutivo</h2>
+          <p class="text-secondary mb-0">Resumen general de la operacion</p>
+        </div>
+      </div>
+
+      <!--Tarjetas resumen: clientes registrados y solicitudes de credito-->
+      <div class="row g-4">
+        <div class="col-12 col-md-6">
+          <a
+            th:href="@{/admin/registro-admin}"
+            class="text-decoration-none d-block h-100"
+          >
+            <div
+              class="bg-primary bg-gradient rounded p-4 text-white shadow h-100"
+            >
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h3
+                    class="h6 text-uppercase text-white-50 tracking-wider mb-2"
+                  >
+                    Clientes Registrados
+                  </h3>
+                  <p
+                    class="display-5 fw-bold mb-0"
+                    th:text="${#lists.size(clientes)}"
+                  >
+                    0
+                  </p>
+                </div>
+                <i class="fa-solid fa-users fs-1 text-white-50"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-12 col-md-6">
+          <a
+            th:href="@{/admin/credito-admin}"
+            class="text-decoration-none d-block h-100"
+          >
+            <div class="bg-dark bg-gradient rounded p-4 text-white shadow h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h3
+                    class="h6 text-uppercase text-white-50 tracking-wider mb-2"
+                  >
+                    Solicitudes de Credito
+                  </h3>
+                  <p
+                    class="display-5 fw-bold mb-0"
+                    th:text="${#lists.size(solicitudes)}"
+                  >
+                    0
+                  </p>
+                </div>
+                <i class="fa-solid fa-money-check-dollar fs-1 text-white-50"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

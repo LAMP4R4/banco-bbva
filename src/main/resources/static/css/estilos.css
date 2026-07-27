@@ -1,0 +1,578 @@
+/* =============================================
+   VARIABLES Y BASE (TEMA OSCURO)
+   ============================================= */
+:root {
+  --banco-azul:        #3b82f6;
+  --banco-azul-hover:  #2563eb;
+  --banco-verde:       #22c55e;
+  --banco-verde-hover: #16a34a;
+  --banco-rojo:        #ef4444;
+  --banco-rojo-hover:  #dc2626;
+  --banco-naranja:       #f97316;
+  --banco-naranja-hover: #ea580c;
+
+  --bg-fondo:          #0b1220;
+  --bg-superficie:     #141b2d;
+  --bg-superficie-alt: #1b2436;
+  --bg-hover:          #202b41;
+
+  --banco-borde:       #2a3550;
+  --texto-principal:   #e6e9ef;
+  --texto-secundario:  #94a3b8;
+
+  --sombra-card:       0 2px 12px rgba(0,0,0,.35);
+  --sombra-hover:      0 10px 28px rgba(0,0,0,.45);
+  --transicion:        .25s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-fondo);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--texto-principal);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main.container {
+  flex: 1;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+a {
+  color: var(--banco-azul);
+}
+
+/* =============================================
+   BARRA DE SEGURIDAD
+   ============================================= */
+.bg-dark.text-secondary.py-1 {
+  background-color: #060a12 !important;
+  border-bottom: 1px solid var(--banco-borde);
+  font-size: .78rem;
+  letter-spacing: .02em;
+}
+
+.bg-dark.text-secondary.py-1 .text-success {
+  color: var(--banco-verde) !important;
+  font-weight: 500;
+}
+
+/* =============================================
+   NAVBAR
+   ============================================= */
+.navbar.bg-primary {
+  background: linear-gradient(135deg, #0f2147 0%, #16305f 100%) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .5);
+  border-bottom: 1px solid var(--banco-borde);
+  padding-top: .65rem;
+  padding-bottom: .65rem;
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: .03em;
+  transition: opacity var(--transicion);
+}
+
+.navbar-brand:hover {
+  opacity: .85;
+}
+
+.navbar .nav-link {
+  font-size: .9rem;
+  font-weight: 500;
+  padding: .45rem .75rem !important;
+  border-radius: 6px;
+  color: var(--texto-secundario) !important;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  background-color: rgba(255, 255, 255, .08);
+  color: var(--texto-principal) !important;
+}
+
+.navbar .dropdown-menu {
+  background-color: var(--bg-superficie-alt);
+  border: 1px solid var(--banco-borde);
+  border-radius: 10px;
+  box-shadow: var(--sombra-hover);
+  padding: .5rem;
+  margin-top: .4rem;
+}
+
+.navbar .dropdown-item {
+  border-radius: 6px;
+  font-size: .875rem;
+  padding: .5rem .85rem;
+  color: var(--texto-principal);
+  transition: background var(--transicion);
+}
+
+.navbar .dropdown-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--banco-azul);
+}
+
+/* Badge de usuario en la navbar */
+.user-badge {
+  background-color: var(--bg-superficie-alt) !important;
+  border: 1px solid var(--banco-borde) !important;
+  color: var(--texto-principal);
+}
+
+.bg-dark-soft {
+  background-color: var(--bg-superficie-alt) !important;
+}
+
+.text-primary-accent {
+  color: var(--banco-azul) !important;
+}
+
+.bg-primary-accent {
+  background-color: var(--banco-azul) !important;
+}
+
+.btn-outline-danger-accent {
+  border: 1.5px solid var(--banco-rojo);
+  color: var(--banco-rojo);
+  background: transparent;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.btn-outline-danger-accent:hover {
+  background-color: var(--banco-rojo);
+  color: #fff;
+}
+
+.btn-success {
+  background-color: var(--banco-verde) !important;
+  border-color: var(--banco-verde) !important;
+  font-weight: 600;
+  transition: background var(--transicion), transform var(--transicion);
+}
+
+.btn-success:hover {
+  background-color: var(--banco-verde-hover) !important;
+  border-color: var(--banco-verde-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-naranja {
+  background-color: var(--banco-naranja) !important;
+  border-color: var(--banco-naranja) !important;
+  color: #fff !important;
+  font-weight: 600;
+  transition: background var(--transicion), transform var(--transicion);
+}
+
+.btn-naranja:hover {
+  background-color: var(--banco-naranja-hover) !important;
+  border-color: var(--banco-naranja-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-light:hover {
+  transform: translateY(-1px);
+}
+
+/* =============================================
+   CARDS GENERALES
+   ============================================= */
+.card {
+  border: 1px solid var(--banco-borde);
+  border-radius: 14px;
+  box-shadow: var(--sombra-card);
+  transition: box-shadow var(--transicion), transform var(--transicion);
+  background: var(--bg-superficie);
+  color: var(--texto-principal);
+}
+
+.card:hover {
+  box-shadow: var(--sombra-hover);
+  transform: translateY(-3px);
+}
+
+.card-header {
+  background-color: var(--bg-superficie-alt);
+  border-bottom: 1px solid var(--banco-borde);
+  border-radius: 14px 14px 0 0 !important;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+}
+
+/* Fondos claros heredados de Bootstrap reconvertidos a oscuro */
+.bg-white {
+  background-color: var(--bg-superficie) !important;
+  color: var(--texto-principal);
+}
+
+.text-dark {
+  color: var(--texto-principal) !important;
+}
+
+.text-secondary {
+  color: var(--texto-secundario) !important;
+}
+
+/* =============================================
+   TARJETAS DE SALDO (uso en dashboard)
+   ============================================= */
+.card-saldo,
+.bg-primary.bg-gradient {
+  background: linear-gradient(135deg, #14336b 0%, #1d4ed8 100%) !important;
+  color: #fff;
+  border: none;
+}
+
+.card-saldo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(29, 78, 216, .4);
+}
+
+.card-saldo .card-title {
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .8;
+}
+
+.card-saldo .monto {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+/* =============================================
+   TABLA DE MOVIMIENTOS
+   ============================================= */
+.tabla-movimientos,
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--texto-principal);
+}
+
+.tabla-movimientos thead th,
+.table-light,
+table thead th {
+  background-color: var(--bg-superficie-alt) !important;
+  color: var(--banco-azul) !important;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  border-bottom: 2px solid var(--banco-borde);
+  padding: .85rem 1rem;
+}
+
+.tabla-movimientos tbody tr,
+table tbody tr {
+  transition: background var(--transicion);
+  color: var(--texto-principal);
+}
+
+.tabla-movimientos tbody tr:hover,
+table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.tabla-movimientos td,
+table td {
+  padding: .85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--banco-borde);
+  font-size: .9rem;
+}
+
+/* Badges de Tipo de movimiento (categoria), independientes del color +/- del monto */
+.badge-deposito,
+.badge-transferencia {
+  font-size: .75rem;
+  padding: .35em .7em;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .3em;
+}
+
+.badge-deposito {
+  background-color: rgba(59, 130, 246, .15);
+  color: #60a5fa;
+}
+
+.badge-transferencia {
+  background-color: rgba(168, 85, 247, .28);
+  color: #a855f7;
+}
+
+/* Cuenta origen/destino con font monoespaciada, igual que el resto de CLABEs del sitio */
+.celda-cuenta {
+  font-family: 'Consolas', monospace;
+  font-size: .8rem;
+}
+
+.celda-fecha {
+  color: var(--texto-secundario);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+/* =============================================
+   ALERTS Y NOTIFICACIONES
+   ============================================= */
+.alert {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--sombra-card);
+}
+
+.alert-success,
+.alert-custom-success {
+  background-color: rgba(34, 197, 94, .15);
+  color: #4ade80;
+}
+
+.alert-warning {
+  background-color: rgba(234, 179, 8, .15);
+  color: #facc15;
+}
+
+.alert-danger,
+.alert-custom-danger {
+  background-color: rgba(239, 68, 68, .15);
+  color: #f87171;
+}
+
+.alert-info {
+  background-color: rgba(59, 130, 246, .15);
+  color: #60a5fa;
+}
+
+/* =============================================
+   BOTONES PERSONALIZADOS
+   ============================================= */
+.btn-banco {
+  background: linear-gradient(135deg, var(--banco-azul) 0%, var(--banco-azul-hover) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: .55rem 1.3rem;
+  transition: box-shadow var(--transicion), transform var(--transicion);
+}
+
+.btn-banco:hover {
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, .45);
+  transform: translateY(-1px);
+}
+
+.btn-banco-outline {
+  border: 2px solid var(--banco-azul);
+  color: var(--banco-azul);
+  border-radius: 8px;
+  font-weight: 600;
+  padding: .5rem 1.25rem;
+  background: transparent;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.btn-banco-outline:hover {
+  background-color: var(--banco-azul);
+  color: #fff;
+}
+
+/* =============================================
+   FORMULARIOS
+   ============================================= */
+.form-control,
+.form-select {
+  background-color: var(--bg-superficie-alt);
+  border-radius: 8px;
+  border: 1.5px solid var(--banco-borde);
+  color: var(--texto-principal);
+  padding: .6rem 1rem;
+  font-size: .9rem;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.form-control::placeholder {
+  color: var(--texto-secundario);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--bg-superficie-alt);
+  color: var(--texto-principal);
+  border-color: var(--banco-azul);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+}
+
+.form-label {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
+  margin-bottom: .35rem;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+footer.bg-dark {
+  background-color: #060a12 !important;
+  border-top: 1px solid var(--banco-borde);
+  margin-top: auto;
+}
+
+footer a.text-light:hover {
+  color: var(--banco-verde) !important;
+  transition: color var(--transicion);
+}
+
+footer a.text-secondary:hover {
+  color: var(--texto-principal) !important;
+  transition: color var(--transicion);
+}
+
+footer .fw-bold {
+  font-size: 1.1rem;
+  letter-spacing: .03em;
+}
+
+/* =============================================
+   UTILIDADES EXTRA
+   ============================================= */
+.seccion-titulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  border-left: 4px solid var(--banco-verde);
+  padding-left: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.icono-circulo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.icono-circulo-azul  { background-color: rgba(59, 130, 246, .15); color: var(--banco-azul); }
+.icono-circulo-verde { background-color: rgba(34, 197, 94, .15); color: var(--banco-verde); }
+.icono-circulo-rojo  { background-color: rgba(239, 68, 68, .15); color: var(--banco-rojo); }
+
+/* =============================================
+   SOLICITUD DE CRÉDITO (tarjeta glassmorphic + textos destacados)
+   ============================================= */
+.card-glassmorphic {
+  background: linear-gradient(135deg, rgba(27, 36, 54, .9) 0%, rgba(15, 21, 36, .9) 100%) !important;
+  border: 1px solid rgba(148, 163, 184, .18) !important;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #60a5fa 0%, #4ade80 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-secondary-soft {
+  background-color: rgba(148, 163, 184, .18) !important;
+}
+
+.btn-primary-accent {
+  background: linear-gradient(135deg, var(--banco-verde) 0%, var(--banco-verde-hover) 100%);
+  border: none;
+  color: #05210f !important;
+  font-weight: 700;
+  transition: box-shadow var(--transicion), transform var(--transicion);
+}
+
+.btn-primary-accent:hover {
+  box-shadow: 0 4px 18px rgba(34, 197, 94, .5);
+  transform: translateY(-1px);
+  color: #05210f !important;
+}
+
+.btn-outline-secondary-accent {
+  border: 1.5px solid var(--banco-borde);
+  color: #cbd5e1;
+  background: transparent;
+  transition: background var(--transicion), color var(--transicion), border-color var(--transicion);
+}
+
+.btn-outline-secondary-accent:hover {
+  background-color: var(--bg-hover);
+  color: var(--texto-principal);
+  border-color: var(--banco-azul);
+}
+
+.input-group-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group-custom .input-icon {
+  position: absolute;
+  left: 1rem;
+  pointer-events: none;
+}
+
+.form-control-custom {
+  width: 100%;
+  background-color: var(--bg-superficie-alt);
+  border: 1.5px solid var(--banco-borde);
+  border-radius: 8px;
+  padding: .65rem 1rem .65rem 2.6rem;
+  font-size: 1.1rem;
+  color: #4ade80;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: var(--banco-azul);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .25);
+}
+
+.signature-pad-container {
+  background-color: var(--bg-superficie-alt) !important;
+}
+
+.signature-pad-canvas {
+  display: block;
+  border-radius: 6px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 768px) {
+  .card-saldo .monto {
+    font-size: 1.5rem;
+  }
+
+  main.container {
+    padding-top: 1.25rem;
+    padding-bottom: 2rem;
+  }
+
+  .seccion-titulo {
+    font-size: 1.15rem;
+  }
+}

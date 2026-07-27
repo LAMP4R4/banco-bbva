@@ -1,0 +1,205 @@
+<!doctype html>
+<!-- Fragmento Thymeleaf reutilizable: recibe "title" y "content" y arma el layout completo de cada página -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:fragment="layout(title, content)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title}">Banco nacional</title>
+    <!-- Bootstrap CSS -->
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <!-- Iconos de Bootstrap Icons (bi bi-*) usados en toda la navbar, footer y barra de seguridad -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Estilos propios del proyecto, sobrescriben o complementan a Bootstrap -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+
+    <!-- JS de Bootstrap (dropdowns, navbar colapsable, etc.) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <!-- Barra de seguridad: franja superior fija con mensajes de confianza (conexión segura, alertas) y teléfono de contacto -->
+    <div class="bg-dark text-secondary py-1">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center small">
+          <div class="d-flex gap-3 align-items-center">
+            <span class="text-success">
+              <i class="bi bi-shield-lock-fill"></i> Conexión Segura
+            </span>
+            <span class="d-none d-sm-inline">|</span>
+            <!-- Se oculta en pantallas muy pequeñas (d-none d-sm-inline) para no saturar el header en móvil -->
+            <span class="d-none d-sm-inline">
+              <i class="bi bi-bell-fill"></i> Alertas activadas
+            </span>
+          </div>
+          <div><i class="bi bi-telephone-fill"></i> 01-800-BANCO</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar principal: logo, menú de navegación y accesos de login/banca empresas. sticky-top la mantiene visible al hacer scroll -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/dashboard}">
+          <i class="bi bi-bank2"></i> BBVA
+        </a>
+
+        <!-- Botón hamburguesa: colapsa/expande el menú en pantallas pequeñas (controla #navbarBanco) -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarBanco"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarBanco">
+          <!-- Enlaces de navegación centrales (mx-auto los centra en pantallas grandes) -->
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link active" th:href="@{/dashboard}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link" th:href="@{/transferencia}">
+                <i class="bi bi-arrow-left-right"></i> Transferir
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link" href="/credito">
+                <i class="bi bi-cash-coin"></i> Solicitar Crédito
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link" th:href="@{/perfil}">
+                <i class="bi bi-person-fill"></i> Mi Perfil
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('EJECUTIVO')">
+              <a class="nav-link" href="/admin/panel-ejecutivo">
+                Panel Ejecutivo
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('EJECUTIVO')">
+              <a class="nav-link" href="/admin/registro-admin">
+                <i class="bi bi-person-plus"></i> Registrar Cliente
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('EJECUTIVO')">
+              <a class="nav-link" href="/admin/credito-admin">
+                <i class="bi bi-clipboard-check"></i> Créditos Solicitantes
+              </a>
+            </li>
+
+            <li class="nav-item" sec:authorize="hasRole('EJECUTIVO')">
+              <a class="nav-link" href="/admin/movimientos">
+                <i class="bi bi-clipboard-check"></i> Movimientos
+              </a>
+            </li>
+          </ul>
+
+          <!-- Acciones a la derecha: banca empresas (solo visible en pantallas grandes) e iniciar sesión -->
+          <li class="nav-item ms-3 d-flex align-items-center gap-3">
+            <div
+              class="user-badge px-3 py-1.5 rounded-pill bg-dark-soft border"
+            >
+              <i class="fa-solid fa-circle-user text-primary-accent"></i>
+              <span class="small fw-semibold" sec:authentication="name"
+                >Usuario</span
+              >
+              <span
+                class="badge bg-primary-accent rounded-pill text-dark text-uppercase small"
+                style="font-size: 0.65rem"
+                sec:authorize="hasRole('EJECUTIVO')"
+                >Ejecutivo</span
+              >
+              <span
+                class="badge bg-primary-accent rounded-pill text-dark text-uppercase small"
+                style="font-size: 0.65rem"
+                sec:authorize="hasRole('CLIENTE')"
+                >Cliente</span
+              >
+            </div>
+            <!-- Formulario de Logout (recomendado en spring security)-->
+            <form th:action="@{/logout}" method="post" class="m-0">
+              <button
+                type="submit"
+                class="btn btn-outline-danger-accent btn-sm rounded-pill px-3 py-1.5 fw-semibold d-flex align-items-center gap-1"
+              >
+                <i class="fa-solid fa-right-from-bracket"></i>Salir
+              </button>
+            </form>
+          </li>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenido principal, aqui se inyectan las paginas -->
+    <main class="container">
+      <div th:replace="${content}"></div>
+    </main>
+
+    <!-- Footer: marca/copyright, redes sociales y enlaces legales, distribuidos en 3 columnas -->
+    <footer class="bg-dark text-light py-4">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Columna 1: logo y aviso de derechos reservados -->
+          <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+            <span class="fw-bold"> <i class="bi bi-bank2"></i> BBVA </span>
+            <span class="text-secondary small d-block"
+              >© 2025 Todos los derechos reservados</span
+            >
+          </div>
+          <!-- Columna 2: iconos de redes sociales -->
+          <div class="col-md-4 text-center mb-3 mb-md-0">
+            <div class="d-flex justify-content-center gap-4">
+              <a href="#" class="text-light"
+                ><i class="bi bi-facebook fs-5"></i
+              ></a>
+              <a href="#" class="text-light"
+                ><i class="bi bi-twitter-x fs-5"></i
+              ></a>
+              <a href="#" class="text-light"
+                ><i class="bi bi-instagram fs-5"></i
+              ></a>
+            </div>
+          </div>
+          <!-- Columna 3: enlaces legales/ayuda -->
+          <div class="col-md-4 text-center text-md-end">
+            <div
+              class="d-flex justify-content-center justify-content-md-end gap-3 small"
+            >
+              <a href="#" class="text-secondary text-decoration-none"
+                >Privacidad</a
+              >
+              <a href="#" class="text-secondary text-decoration-none"
+                >Términos</a
+              >
+              <a href="#" class="text-secondary text-decoration-none">Ayuda</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts de Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout :: layout(title='Mi Perfil', content=~{::section})}"
+>
+  <head>
+    <title>Document</title>
+  </head>
+  <body>
+    <section>
+      <!-- Encabezado de la seccion -->
+      <div
+        class="bg-white rounded shadow p-4 mb-4 d-flex align-items-center gap-3"
+      >
+        <div class="icono-circulo icono-circulo-azul">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div>
+          <h2 class="h4 fw-bold mb-1">Mi Perfil</h2>
+          <p class="text-secondary mb-0">
+            Consulta tus datos personales y la información de tus cuentas
+          </p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Datos personales -->
+        <div class="col-12 col-lg-5">
+          <div class="card border-0 shadow-lg p-4 h-100">
+            <div class="text-center mb-4">
+              <div
+                class="rounded-circle bg-primary bg-gradient text-white d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 96px; height: 96px; font-size: 2.5rem"
+              >
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <h4 class="h5 fw-bold mb-0" th:text="${usuario.nombre}">Nombre del Cliente</h4>
+              <span
+                class="badge bg-primary-accent text-dark text-uppercase rounded-pill small"
+                style="font-size: 0.65rem"
+                >Cliente</span
+              >
+            </div>
+
+            <ul class="list-group list-group-flush">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center px-0"
+              >
+                <span class="text-secondary"
+                  ><i class="bi bi-person-badge me-2"></i>Usuario</span
+                >
+                <span class="fw-semibold" th:text="${usuario.userName}">usuario.demo</span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center px-0"
+              >
+                <span class="text-secondary"
+                  ><i class="bi bi-envelope me-2"></i>Correo</span
+                >
+                <span class="fw-semibold">cliente@correo.com</span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center px-0"
+              >
+                <span class="text-secondary"
+                  ><i class="bi bi-telephone me-2"></i>Teléfono</span
+                >
+                <span class="fw-semibold">55 0000 0000</span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center px-0"
+              >
+                <span class="text-secondary"
+                  ><i class="bi bi-calendar-check me-2"></i>Cliente desde</span
+                >
+                <span class="fw-semibold">01/01/2024</span>
+              </li>
+            </ul>
+
+            <div class="d-grid mt-4">
+              <button
+                type="button"
+                class="btn btn-outline-secondary-accent rounded-pill fw-semibold"
+                disabled
+              >
+                <i class="bi bi-pencil-square me-1"></i> Editar datos
+                (próximamente)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuentas asociadas -->
+        <div class="col-12 col-lg-7">
+          <div class="card border-0 shadow-lg p-4 h-100">
+            <h4 class="h5 fw-bold text-dark mb-4">
+              <i class="bi bi-credit-card-2-front me-2"></i>Cuentas Asociadas
+            </h4>
+
+            <div class="d-flex flex-column gap-3">
+              <div
+                th:each="cuenta : ${cuentas}"
+                class="bg-primary bg-gradient rounded p-4 text-white shadow"
+              >
+                <h6 class="text-uppercase text-white-50 small mb-2">
+                  Cuenta de débito
+                </h6>
+                <p class="display-6 fw-bold mb-2">
+                  $
+                  <span
+                    th:text="${#numbers.formatDecimal(cuenta.saldo, 1, 'COMMA', 2, 'POINT')}"
+                    >0.00</span
+                  >
+                  MXN
+                </p>
+                <p
+                  class="small text-white-50 font-monospace mb-0"
+                  th:text="'CLABE: '+${cuenta.clabe}"
+                >
+                  CLABE: 000000000000000000
+                </p>
+              </div>
+              <p th:if="${#lists.isEmpty(cuentas)}" class="text-secondary mb-0">
+                Aún no tienes cuentas asociadas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
