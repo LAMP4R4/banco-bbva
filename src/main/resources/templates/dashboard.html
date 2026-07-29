@@ -32,11 +32,27 @@
           </div>
         </div>
 
+        <div
+          th:if="${param.exito}"
+          class="alert alert-success d-flex align-items-center gap-2 mb-4"
+        >
+          <i class="bi bi-check-circle-fill"></i>
+          <div th:text="${param.exito}">Operación realizada con éxito</div>
+        </div>
+
+        <div
+          th:if="${param.error}"
+          class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+        >
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div th:text="${param.error}">Error en la operación</div>
+        </div>
+
         <div class="row mb-5">
           <div class="col-md-6">
             <!-- Tarjeta de saldo -->
             <div
-              class="bg-primary bg bg-gradient rounded p-4 text-white shadow"
+              class="bg-primary bg bg-gradient rounded p-4 text-white shadow h-100"
             >
               <h3 class="h6 text-uppercase text-white-50 tracking-wider mb-2">
                 Cuenta de debito principal
@@ -53,6 +69,65 @@
                 th:text="'CLABE:'+${cuentaClabe}"
               >
                 CLABE: 1234567890
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <!-- Tarjeta de abono a creditos -->
+            <div
+              th:if="${creditoPendiente != null}"
+              class="bg bg-gradient rounded p-4 text-white shadow h-100"
+              style="background-color: #b3541e"
+            >
+              <h3 class="h6 text-uppercase text-white-50 tracking-wider mb-2">
+                Crédito por pagar
+              </h3>
+              <p class="display-6 fw-bold mb-1">
+                $
+                <span
+                  th:text="${#numbers.formatDecimal(creditoPendiente.montoPendiente, 1, 'COMMA',2,'POINT')}"
+                  >0.00</span
+                >MXN
+              </p>
+              <p class="small text-white-50 mb-3">
+                Solicitud #<span th:text="${creditoPendiente.id}">1</span> ·
+                Total: $<span
+                  th:text="${#numbers.formatDecimal(creditoPendiente.montoSolicitado, 1, 'COMMA',2,'POINT')}"
+                  >0.00</span
+                >
+              </p>
+              <form
+                th:action="@{/abonar-credito}"
+                method="POST"
+                class="d-flex gap-2"
+              >
+                <input type="hidden" name="solicitudId" th:value="${creditoPendiente.id}" />
+                <input
+                  type="number"
+                  name="montoAbono"
+                  class="form-control form-control-sm"
+                  placeholder="Monto a abonar"
+                  step="0.01"
+                  min="0.01"
+                  th:max="${creditoPendiente.montoPendiente}"
+                  required
+                />
+                <button type="submit" class="btn btn-light btn-sm fw-bold text-nowrap">
+                  <i class="bi bi-cash-coin me-1"></i>Abonar
+                </button>
+              </form>
+            </div>
+
+            <div
+              th:unless="${creditoPendiente != null}"
+              class="bg-success bg-gradient rounded p-4 text-white shadow h-100 d-flex flex-column justify-content-center"
+            >
+              <h3 class="h6 text-uppercase text-white-50 tracking-wider mb-2">
+                Créditos
+              </h3>
+              <p class="h5 fw-bold mb-0">
+                <i class="bi bi-check-circle-fill me-2"></i>No debes ningún crédito
               </p>
             </div>
           </div>

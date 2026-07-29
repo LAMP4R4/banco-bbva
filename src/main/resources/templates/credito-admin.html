@@ -118,68 +118,7 @@
                         </button>
                       </form>
                     </td>
-                    <td class="text-center" th:if="${solicitud.estado == 'APROBADO'}">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-primary"
-                        data-bs-toggle="modal"
-                        th:data-bs-target="'#modalAbono' + ${solicitud.id}"
-                      >
-                        <i class="bi bi-cash-coin me-1"></i>Registrar abono
-                      </button>
-
-                      <div
-                        class="modal fade"
-                        th:id="'modalAbono' + ${solicitud.id}"
-                        tabindex="-1"
-                        aria-hidden="true"
-                      >
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <form
-                              th:action="@{/admin/credito-admin/solicitudes/{id}/abonar(id=${solicitud.id})}"
-                              method="POST"
-                            >
-                              <div class="modal-header">
-                                <h5 class="modal-title">
-                                  Registrar abono - Solicitud #<span th:text="${solicitud.id}">1</span>
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                              </div>
-                              <div class="modal-body">
-                                <p class="mb-2">
-                                  Cliente: <strong th:text="${solicitud.usuario.userName}">usuario</strong>
-                                </p>
-                                <p class="mb-3">
-                                  Saldo pendiente:
-                                  <strong th:text="${'$' + #numbers.formatDecimal(solicitud.montoPendiente ?: solicitud.montoSolicitado, 1, 'COMMA', 2, 'POINT')}">$0.00</strong>
-                                </p>
-                                <label class="form-label">Monto a abonar</label>
-                                <input
-                                  type="number"
-                                  name="montoAbono"
-                                  class="form-control"
-                                  step="0.01"
-                                  min="0.01"
-                                  th:max="${solicitud.montoPendiente ?: solicitud.montoSolicitado}"
-                                  required
-                                />
-                                <div class="form-text">
-                                  El monto se descuenta de la cuenta del cliente y se resta de su saldo pendiente.
-                                </div>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                  Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-primary">Confirmar abono</button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="text-center" th:if="${solicitud.estado == 'RECHAZADO' or solicitud.estado == 'PAGADO'}">
+                    <td class="text-center" th:if="${solicitud.estado != 'PENDIENTE'}">
                       -
                     </td>
                   </tr>

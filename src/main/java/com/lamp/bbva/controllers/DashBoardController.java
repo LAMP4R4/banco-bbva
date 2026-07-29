@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.lamp.bbva.entity.SolicitudCreditoEntity;
 import com.lamp.bbva.entity.cuentaEntity;
 import com.lamp.bbva.entity.movimientosEntity;
 import com.lamp.bbva.entity.usuarioEntity;
 import com.lamp.bbva.repository.movimientoCuentaRepository;
+import com.lamp.bbva.repository.solicitudCreditoRepository;
 import com.lamp.bbva.repository.usuarioRepository;
 import com.lamp.bbva.service.BancaService;
 import com.lamp.bbva.service.PdfService;
@@ -32,13 +34,16 @@ public class DashBoardController {
 
     private final usuarioRepository usuarioRepository;
     private final movimientoCuentaRepository movimientoCuentaRepository;
+    private final solicitudCreditoRepository solicitudCreditoRepository;
     private final BancaService bancaService;
     private final PdfService pdfService;
 
     public DashBoardController(usuarioRepository usuario, movimientoCuentaRepository movimientoCuenta,
+            solicitudCreditoRepository solicitudCreditoRepository,
             BancaService bancaService, PdfService pdfService) {
         this.usuarioRepository = usuario;
         this.movimientoCuentaRepository = movimientoCuenta;
+        this.solicitudCreditoRepository = solicitudCreditoRepository;
         this.bancaService = bancaService;
         this.pdfService = pdfService;
     }
@@ -83,12 +88,18 @@ public class DashBoardController {
 
         }
 
+        // credito mas antiguo pendiente de pago (orden FIFO de abonos)
+        SolicitudCreditoEntity creditoPendiente = solicitudCreditoRepository
+                .findFirstByUsuarioAndEstadoOrderByFechaAsc(usuario, "APROBADO")
+                .orElse(null);
+
         // inyectar los datos al modelo de thymeleaf
         modelo.addAttribute("nombreCliente", usuario.getNombre());
         modelo.addAttribute("saldoTotal", saldo);
         modelo.addAttribute("cuentaClabe", clabe);
         modelo.addAttribute("cuentaEstado", estadoCuenta);
         modelo.addAttribute("movimientos", ultimosMovimientos);
+        modelo.addAttribute("creditoPendiente", creditoPendiente);
 
         return "dashboard";
     }

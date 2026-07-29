@@ -217,20 +217,33 @@ public class BancaService {
         return solicitudCreditoRepository.save(solicitud);
     }
 
-    // Registra un abono del cliente hacia un credito ya aprobado: se descuenta
-    // de su cuenta (igual que se le acredito) y reduce el saldo pendiente hasta
-    // marcar el credito como PAGADO al llegar a $0.
+    // El propio cliente abona a su credito mas antiguo pendiente de pago.
+    // Solo se permite abonar de uno en uno y en orden: mientras el mas antiguo
+    // no quede en $0, los demas creditos aprobados quedan bloqueados.
     @Transactional(rollbackFor = Exception.class)
-    public SolicitudCreditoEntity registrarAbonoCredito(Long solicitudId, Double montoAbono) {
-        if (montoAbono == null || montoAbono <= 0) {
-            throw new IllegalArgumentException("El monto del abono debe ser mayor a cero.");
+    public SolicitudCreditoEntity abonarCreditoCliente(String username, Long solicitudId, Double montoAbono) {
+        usuarioEntity usuario = usuarioRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+
+        SolicitudCreditoEntity creditoActual = solicitudCreditoRepository
+                .findFirstByUsuarioAndEstadoOrderByFechaAsc(usuario, "APROBADO")
+                .orElseThrow(() -> new RuntimeException("No tienes créditos pendientes de pago."));
+
+        if (!creditoActual.getId().equals(solicitudId)) {
+            throw new RuntimeException(
+                    "Debes liquidar primero tu crédito más antiguo pendiente (Solicitud #"
+                            + creditoActual.getId() + ").");
         }
 
-        SolicitudCreditoEntity solicitud = solicitudCreditoRepository.findById(solicitudId)
-                .orElseThrow(() -> new RuntimeException("La solicitud de crédito no existe."));
+        return aplicarAbono(creditoActual, montoAbono);
+    }
 
-        if (!"APROBADO".equals(solicitud.getEstado())) {
-            throw new RuntimeException("Solo se pueden registrar abonos a créditos aprobados.");
+    // Descuenta el abono de la cuenta del cliente (igual que se le acredito),
+    // registra el movimiento y reduce el saldo pendiente hasta marcar el
+    // credito como PAGADO al llegar a $0.
+    private SolicitudCreditoEntity aplicarAbono(SolicitudCreditoEntity solicitud, Double montoAbono) {
+        if (montoAbono == null || montoAbono <= 0) {
+            throw new IllegalArgumentException("El monto del abono debe ser mayor a cero.");
         }
 
         // Compatibilidad con creditos aprobados antes de existir este saldo
@@ -249,7 +262,7 @@ public class BancaService {
                 .orElseThrow(() -> new RuntimeException("El cliente no tiene una cuenta bancaria asignada."));
 
         if (cuenta.getSaldo() < montoAbono) {
-            throw new FondosInsuficientesException("El cliente no cuenta con saldo suficiente para este abono.");
+            throw new FondosInsuficientesException("No cuentas con saldo suficiente para este abono.");
         }
 
         // CARGO a la cuenta del cliente
@@ -263,7 +276,7 @@ public class BancaService {
         movimiento.setMonto(montoAbono);
         movimiento.setEstadoMovimiento("AUTORIZADO");
         movimiento.setTipo("Pago Credito");
-        movimiento.setDescripcion("Abono a crédito - Solicitud #" + solicitudId);
+        movimiento.setDescripcion("Abono a crédito - Solicitud #" + solicitud.getId());
         movimiento.setFecha(LocalDate.now());
         movimientoRepository.save(movimiento);
 

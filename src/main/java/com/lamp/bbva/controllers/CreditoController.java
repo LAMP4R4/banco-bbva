@@ -79,4 +79,20 @@ public class CreditoController {
         }
     }
 
+    // El cliente abona a su credito mas antiguo pendiente desde el dashboard
+    @PostMapping("/abonar-credito")
+    public String abonarCredito(
+            @RequestParam Long solicitudId,
+            @RequestParam Double montoAbono,
+            Authentication auth) {
+
+        String username = auth.getName();
+        try {
+            bancaService.abonarCreditoCliente(username, solicitudId, montoAbono);
+            return "redirect:/dashboard?exito=Abono realizado con exito";
+        } catch (Exception e) {
+            return "redirect:/dashboard?error=" + e.getMessage();
+        }
+    }
+
 }
