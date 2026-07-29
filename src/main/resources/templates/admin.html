@@ -163,10 +163,10 @@
             </h3>
             <div class="alert alert-warning small mb-3">
               <i class="bi bi-exclamation-triangle-fill me-1"></i>
-              Las cuentas <strong>Retenidas</strong> o <strong>Deshabilitadas</strong>
-              no pueden enviar ni recibir transferencias, ni solicitar créditos.
-              Además, un cliente con la cuenta <strong>Deshabilitada</strong> no
-              puede iniciar sesión.
+              Las cuentas <strong>Retenidas</strong> o
+              <strong>Deshabilitadas</strong> no pueden enviar ni recibir
+              transferencias, ni solicitar créditos. Además, un cliente con la
+              cuenta <strong>Deshabilitada</strong> no puede iniciar sesión.
             </div>
             <div class="table-responsive">
               <table class="table table-hover bordered bg-white align-middle">
@@ -202,7 +202,10 @@
                     >
                       PENDIENTE
                     </td>
-                    <td class="text-center" th:insert="~{fragments/cliente-acciones :: acciones-cliente(${cliente}, '/admin/dashboard')}"></td>
+                    <td
+                      class="text-center"
+                      th:insert="~{fragments/cliente-acciones :: acciones-cliente(${cliente}, '/admin/dashboard')}"
+                    ></td>
                   </tr>
                   <tr th:if="${#lists.isEmpty(clientes)}">
                     <td class="text-center text-muted" colspan="5">
@@ -218,7 +221,9 @@
 
       <!--Modales de edicion de cliente (fuera de la tabla para que el HTML sea valido)-->
       <th:block th:each="cliente : ${clientes}">
-        <div th:replace="~{fragments/cliente-acciones :: modal-editar-cliente(${cliente}, '/admin/dashboard')}"></div>
+        <div
+          th:replace="~{fragments/cliente-acciones :: modal-editar-cliente(${cliente}, '/admin/dashboard')}"
+        ></div>
       </th:block>
 
       <!--Tabla de auditoria de solicitudes de credito-->
@@ -258,10 +263,15 @@
                       $0.00
                     </td>
                     <td class="text-center">
-                      <span th:if="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}"
+                      <span
+                        th:if="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}"
                         th:text="${'$' + #numbers.formatDecimal(solicitud.montoPendiente ?: solicitud.montoSolicitado, 1, 'COMMA', 2, 'POINT')}"
-                      >$0.00</span>
-                      <span th:unless="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}">-</span>
+                        >$0.00</span
+                      >
+                      <span
+                        th:unless="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}"
+                        >-</span
+                      >
                     </td>
                     <td class="text-center">
                       <span
@@ -278,7 +288,10 @@
                     >
                       01/01/2026 00:00
                     </td>
-                    <td class="text-center" th:if="${solicitud.estado == 'PENDIENTE'}">
+                    <td
+                      class="text-center"
+                      th:if="${solicitud.estado == 'PENDIENTE'}"
+                    >
                       <form
                         th:action="@{/admin/solicitudes/{id}/aprobar(id=${solicitud.id})}"
                         method="POST"
@@ -298,7 +311,10 @@
                         </button>
                       </form>
                     </td>
-                    <td class="text-center" th:unless="${solicitud.estado == 'PENDIENTE'}">
+                    <td
+                      class="text-center"
+                      th:unless="${solicitud.estado == 'PENDIENTE'}"
+                    >
                       -
                     </td>
                   </tr>

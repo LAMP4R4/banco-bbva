@@ -1,5 +1,6 @@
 package com.lamp.bbva.controllers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,6 +235,30 @@ public class AdminController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(ContentDisposition.inline().filename("reporte-clientes.pdf").build());
+        return ResponseEntity.ok().headers(headers).body(pdf);
+    }
+
+    // Historial de movimientos en PDF de un cliente puntual, descargado desde
+    // la cartera de clientes del admin.
+    @GetMapping("/clientes/{id}/historial-pdf")
+    public ResponseEntity<byte[]> descargarHistorialCliente(@PathVariable Long id) {
+        usuarioEntity cliente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado."));
+
+        String clabe = "";
+        List<movimientosEntity> movimientos = new ArrayList<>();
+        if (cliente.getCuentas() != null && !cliente.getCuentas().isEmpty()) {
+            clabe = cliente.getCuentas().get(0).getClabe();
+            movimientos = movimientoCuentaRepository.findByCuentaOrigenOrCuentaDestinoOrderByFechaDescIdDesc(clabe,
+                    clabe);
+        }
+
+        byte[] pdf = pdfService.generarHistorialCliente(cliente, clabe, movimientos);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.inline().filename("historial-" + cliente.getUserName() + ".pdf").build());
         return ResponseEntity.ok().headers(headers).body(pdf);
     }
 
