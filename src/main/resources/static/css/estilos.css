@@ -424,6 +424,30 @@ table td {
 }
 
 /* =============================================
+   MODALES (Bootstrap por defecto es claro, reconvertido a oscuro)
+   ============================================= */
+.modal-content {
+  background-color: var(--bg-superficie);
+  color: var(--texto-principal);
+  border: 1px solid var(--banco-borde);
+  border-radius: 14px;
+  box-shadow: var(--sombra-hover);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--banco-borde);
+}
+
+.modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(1.5);
+}
+
+.modal-backdrop.show {
+  opacity: .65;
+}
+
+/* =============================================
    FOOTER
    ============================================= */
 footer.bg-dark {

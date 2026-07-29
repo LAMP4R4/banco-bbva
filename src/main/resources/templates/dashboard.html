@@ -58,6 +58,7 @@
                 <th class="text-end">Monto</th>
                 <th class="text-center">Tipo</th>
                 <th class="text-center">Estado</th>
+                <th class="text-center">Comprobante</th>
               </tr>
             </thead>
             <tbody>
@@ -93,9 +94,19 @@
                     <span th:text="${movimiento.estadoMovimiento}">PENDIENTE</span>
                   </span>
                 </td>
+                <td class="text-center">
+                  <a
+                    th:href="@{/movimientos/{id}/comprobante(id=${movimiento.id})}"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-secondary-accent"
+                    title="Ver comprobante"
+                  >
+                    <i class="bi bi-file-earmark-text me-1"></i>Comprobante
+                  </a>
+                </td>
               </tr>
               <tr th:if="${#lists.isEmpty(movimientos)}">
-                <td class="text-center text-muted" colspan="5">
+                <td class="text-center text-muted" colspan="6">
                   Aún no tienes movimientos registrados.
                 </td>
               </tr>

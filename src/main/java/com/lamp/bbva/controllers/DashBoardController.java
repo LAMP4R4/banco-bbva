@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -18,6 +23,7 @@ import com.lamp.bbva.entity.usuarioEntity;
 import com.lamp.bbva.repository.movimientoCuentaRepository;
 import com.lamp.bbva.repository.usuarioRepository;
 import com.lamp.bbva.service.BancaService;
+import com.lamp.bbva.service.PdfService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -27,12 +33,14 @@ public class DashBoardController {
     private final usuarioRepository usuarioRepository;
     private final movimientoCuentaRepository movimientoCuentaRepository;
     private final BancaService bancaService;
+    private final PdfService pdfService;
 
     public DashBoardController(usuarioRepository usuario, movimientoCuentaRepository movimientoCuenta,
-            BancaService bancaService) {
+            BancaService bancaService, PdfService pdfService) {
         this.usuarioRepository = usuario;
         this.movimientoCuentaRepository = movimientoCuenta;
         this.bancaService = bancaService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/")
@@ -129,6 +137,68 @@ public class DashBoardController {
             redirectAttributes.addAttribute("error", e.getMessage());
             return "redirect:/perfil";
         }
+    }
+
+    // Comprobante formal de un movimiento. Un cliente solo puede ver el de
+    // movimientos donde participa alguna de sus propias cuentas; un ejecutivo
+    // puede ver el de cualquier movimiento.
+    @GetMapping("/movimientos/{id}/comprobante")
+    public ResponseEntity<byte[]> descargarComprobante(@PathVariable Long id, Authentication auth) {
+        if (auth == null) {
+            throw new RuntimeException("No autenticado");
+        }
+
+        movimientosEntity movimiento = bancaService.obtenerMovimientoId(id);
+        if (movimiento == null) {
+            throw new RuntimeException("Movimiento no encontrado");
+        }
+
+        usuarioEntity usuario = usuarioRepository.findByUserName(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        boolean esDueno = usuario.getCuentas() != null && usuario.getCuentas().stream()
+                .anyMatch(c -> c.getClabe().equals(movimiento.getCuentaOrigen())
+                        || c.getClabe().equals(movimiento.getCuentaDestino()));
+
+        if (!"EJECUTIVO".equals(usuario.getRol()) && !esDueno) {
+            throw new RuntimeException("No tienes permiso para ver este comprobante");
+        }
+
+        byte[] pdf = pdfService.generarComprobanteMovimiento(movimiento);
+        return respuestaPdf(pdf, "comprobante-movimiento-" + id + ".pdf");
+    }
+
+    // Historial de gastos y ganancias del cliente autenticado (nunca de otro
+    // usuario: la clabe siempre sale de su propia cuenta).
+    @GetMapping("/perfil/historial-pdf")
+    public ResponseEntity<byte[]> descargarHistorial(Authentication auth) {
+        if (auth == null) {
+            throw new RuntimeException("No autenticado");
+        }
+
+        usuarioEntity usuario = usuarioRepository.findByUserName(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<movimientosEntity> movimientos = new ArrayList<>();
+        String clabe = "";
+        if (usuario.getCuentas() != null && !usuario.getCuentas().isEmpty()) {
+            clabe = usuario.getCuentas().get(0).getClabe();
+            movimientos = movimientoCuentaRepository.findByCuentaOrigenOrCuentaDestinoOrderByFechaDescIdDesc(clabe,
+                    clabe);
+        }
+
+        byte[] pdf = pdfService.generarHistorialCliente(usuario, clabe, movimientos);
+        return respuestaPdf(pdf, "historial-" + usuario.getUserName() + ".pdf");
+    }
+
+    // Content-Disposition "inline" para que el navegador muestre la
+    // previsualizacion del PDF en una pestaña antes de que el usuario decida
+    // descargarlo.
+    private ResponseEntity<byte[]> respuestaPdf(byte[] pdf, String nombreArchivo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.inline().filename(nombreArchivo).build());
+        return ResponseEntity.ok().headers(headers).body(pdf);
     }
 
 }

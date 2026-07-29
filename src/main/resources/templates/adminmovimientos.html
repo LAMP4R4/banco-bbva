@@ -128,6 +128,14 @@
                     </td>
                     <td class="text-center">
                       <div class="d-flex justify-content-center gap-2">
+                        <a
+                          th:href="@{/movimientos/{id}/comprobante(id=${movimiento.id})}"
+                          target="_blank"
+                          class="btn btn-outline-secondary-accent rounded shadow-sm"
+                          title="Ver comprobante"
+                        >
+                          <i class="bi bi-file-earmark-text"></i>
+                        </a>
                         <form
                           th:if="${movimiento.estadoMovimiento!='AUTORIZADO'}"
                           th:action="@{/admin/movimientos/actualizar-estado}"

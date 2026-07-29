@@ -1,17 +1,26 @@
 package com.lamp.bbva.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.lamp.bbva.entity.SolicitudCreditoEntity;
+import com.lamp.bbva.entity.movimientosEntity;
 import com.lamp.bbva.entity.usuarioEntity;
+import com.lamp.bbva.repository.movimientoCuentaRepository;
 import com.lamp.bbva.repository.solicitudCreditoRepository;
 import com.lamp.bbva.repository.usuarioRepository;
 import com.lamp.bbva.service.BancaService;
+import com.lamp.bbva.service.PdfService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,12 +34,17 @@ public class AdminController {
     private final BancaService bancaService;
     private final usuarioRepository usuarioRepository;
     private final solicitudCreditoRepository solicitudCreditoRepository;
+    private final movimientoCuentaRepository movimientoCuentaRepository;
+    private final PdfService pdfService;
 
     public AdminController(BancaService bancaService, usuarioRepository usuarioRepository,
-            solicitudCreditoRepository solicitudCreditoRepository) {
+            solicitudCreditoRepository solicitudCreditoRepository,
+            movimientoCuentaRepository movimientoCuentaRepository, PdfService pdfService) {
         this.bancaService = bancaService;
         this.usuarioRepository = usuarioRepository;
         this.solicitudCreditoRepository = solicitudCreditoRepository;
+        this.movimientoCuentaRepository = movimientoCuentaRepository;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/dashboard")
@@ -196,6 +210,31 @@ public class AdminController {
         modelo.addAttribute("clientes", clientes);
 
         return "registro-admin";
+    }
+
+    // Reporte formal en PDF de la cartera de clientes junto con su historial
+    // de movimientos, usado desde el Panel Ejecutivo.
+    @GetMapping("/reporte-clientes")
+    public ResponseEntity<byte[]> descargarReporteClientes() {
+        List<usuarioEntity> clientes = usuarioRepository.findAll().stream().filter(u -> "CLIENTE".equals(u.getRol()))
+                .collect(Collectors.toList());
+
+        Map<Long, List<movimientosEntity>> historialPorCliente = new HashMap<>();
+        for (usuarioEntity cliente : clientes) {
+            if (cliente.getCuentas() != null && !cliente.getCuentas().isEmpty()) {
+                String clabe = cliente.getCuentas().get(0).getClabe();
+                historialPorCliente.put(cliente.getId(),
+                        movimientoCuentaRepository.findByCuentaOrigenOrCuentaDestinoOrderByFechaDescIdDesc(clabe,
+                                clabe));
+            }
+        }
+
+        byte[] pdf = pdfService.generarReporteClientes(clientes, historialPorCliente);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.inline().filename("reporte-clientes.pdf").build());
+        return ResponseEntity.ok().headers(headers).body(pdf);
     }
 
     @PostMapping("/registro-admin/crear-cliente")
