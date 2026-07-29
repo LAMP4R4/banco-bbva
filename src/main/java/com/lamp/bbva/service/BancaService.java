@@ -213,6 +213,68 @@ public class BancaService {
 
         // ACTUALIZAR ESTADO DEL CRÉDITO
         solicitud.setEstado("APROBADO");
+        solicitud.setMontoPendiente(solicitud.getMontoSolicitado());
+        return solicitudCreditoRepository.save(solicitud);
+    }
+
+    // Registra un abono del cliente hacia un credito ya aprobado: se descuenta
+    // de su cuenta (igual que se le acredito) y reduce el saldo pendiente hasta
+    // marcar el credito como PAGADO al llegar a $0.
+    @Transactional(rollbackFor = Exception.class)
+    public SolicitudCreditoEntity registrarAbonoCredito(Long solicitudId, Double montoAbono) {
+        if (montoAbono == null || montoAbono <= 0) {
+            throw new IllegalArgumentException("El monto del abono debe ser mayor a cero.");
+        }
+
+        SolicitudCreditoEntity solicitud = solicitudCreditoRepository.findById(solicitudId)
+                .orElseThrow(() -> new RuntimeException("La solicitud de crédito no existe."));
+
+        if (!"APROBADO".equals(solicitud.getEstado())) {
+            throw new RuntimeException("Solo se pueden registrar abonos a créditos aprobados.");
+        }
+
+        // Compatibilidad con creditos aprobados antes de existir este saldo
+        Double pendiente = solicitud.getMontoPendiente() != null
+                ? solicitud.getMontoPendiente()
+                : solicitud.getMontoSolicitado();
+
+        if (montoAbono > pendiente) {
+            throw new RuntimeException("El abono no puede ser mayor al saldo pendiente ($"
+                    + String.format("%.2f", pendiente) + ").");
+        }
+
+        usuarioEntity usuario = solicitud.getUsuario();
+        cuentaEntity cuenta = cuentaRepository.findByUsuario(usuario).stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("El cliente no tiene una cuenta bancaria asignada."));
+
+        if (cuenta.getSaldo() < montoAbono) {
+            throw new FondosInsuficientesException("El cliente no cuenta con saldo suficiente para este abono.");
+        }
+
+        // CARGO a la cuenta del cliente
+        cuenta.setSaldo(cuenta.getSaldo() - montoAbono);
+        cuentaRepository.save(cuenta);
+
+        // REGISTRAR MOVIMIENTO
+        movimientosEntity movimiento = new movimientosEntity();
+        movimiento.setCuentaOrigen(cuenta.getClabe());
+        movimiento.setCuentaDestino("CRÉDITO-BANCO");
+        movimiento.setMonto(montoAbono);
+        movimiento.setEstadoMovimiento("AUTORIZADO");
+        movimiento.setTipo("Pago Credito");
+        movimiento.setDescripcion("Abono a crédito - Solicitud #" + solicitudId);
+        movimiento.setFecha(LocalDate.now());
+        movimientoRepository.save(movimiento);
+
+        // ACTUALIZAR SALDO PENDIENTE DEL CRÉDITO
+        double nuevoPendiente = pendiente - montoAbono;
+        if (nuevoPendiente <= 0.001) {
+            nuevoPendiente = 0.0;
+            solicitud.setEstado("PAGADO");
+        }
+        solicitud.setMontoPendiente(nuevoPendiente);
+
         return solicitudCreditoRepository.save(solicitud);
     }
 

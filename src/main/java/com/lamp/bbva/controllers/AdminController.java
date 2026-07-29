@@ -302,4 +302,16 @@ public class AdminController {
         return "redirect:/admin/credito-admin";
     }
 
+    @PostMapping("/credito-admin/solicitudes/{id}/abonar")
+    public String registrarAbonoCredito(@PathVariable Long id, @RequestParam Double montoAbono,
+            RedirectAttributes redirectAttributes) {
+        try {
+            bancaService.registrarAbonoCredito(id, montoAbono);
+            redirectAttributes.addAttribute("exito", "Abono registrado con éxito");
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/credito-admin";
+    }
+
 }

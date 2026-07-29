@@ -40,4 +40,9 @@ public class SolicitudCreditoEntity {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
+    // Saldo que aun falta pagar del credito; se fija al monto solicitado cuando
+    // se aprueba y se reduce con cada abono hasta llegar a 0 (credito PAGADO)
+    @Column(name = "monto_pendiente")
+    private Double montoPendiente;
+
 }
