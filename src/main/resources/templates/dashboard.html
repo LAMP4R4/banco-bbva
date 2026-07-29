@@ -19,6 +19,19 @@
           </span>
         </h2>
 
+        <div
+          th:if="${cuentaEstado == 'RETENIDA' or cuentaEstado == 'DESHABILITADA'}"
+          class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+        >
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+          <div>
+            Tu cuenta se encuentra
+            <strong th:text="${#strings.toLowerCase(cuentaEstado)}">retenida</strong>.
+            No puedes enviar ni recibir transferencias, ni solicitar créditos
+            mientras esté en este estado.
+          </div>
+        </div>
+
         <div class="row mb-5">
           <div class="col-md-6">
             <!-- Tarjeta de saldo -->

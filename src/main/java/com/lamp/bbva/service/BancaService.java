@@ -65,6 +65,12 @@ public class BancaService {
                     + " y no puede realizar transferencias.");
         }
 
+        // Una cuenta retenida o deshabilitada tampoco puede recibir transferencias
+        if ("RETENIDA".equals(destino.getEstado()) || "DESHABILITADA".equals(destino.getEstado())) {
+            throw new RuntimeException("La cuenta destino está " + destino.getEstado().toLowerCase()
+                    + " y no puede recibir transferencias.");
+        }
+
         // Validar fondos del remitente
         if (origen.getSaldo() < monto) {
             throw new FondosInsuficientesException("No cuentas con saldo suficiente para esta operación.");

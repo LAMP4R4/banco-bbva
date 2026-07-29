@@ -70,12 +70,14 @@ public class DashBoardController {
         // cargar datos del cliente
         String clabe = "No asignada";
         Double saldo = 0.0;
+        String estadoCuenta = "ACTIVA";
         List<movimientosEntity> ultimosMovimientos = new ArrayList<>();
 
         if (usuario.getCuentas() != null && !usuario.getCuentas().isEmpty()) {
             cuentaEntity cuentaPrincipal = usuario.getCuentas().get(0);
             clabe = cuentaPrincipal.getClabe();
             saldo = cuentaPrincipal.getSaldo();
+            estadoCuenta = cuentaPrincipal.getEstado();
             ultimosMovimientos = movimientoCuentaRepository
                     .findByCuentaOrigenOrCuentaDestinoOrderByFechaDescIdDesc(clabe, clabe);
 
@@ -85,6 +87,7 @@ public class DashBoardController {
         modelo.addAttribute("nombreCliente", usuario.getNombre());
         modelo.addAttribute("saldoTotal", saldo);
         modelo.addAttribute("cuentaClabe", clabe);
+        modelo.addAttribute("cuentaEstado", estadoCuenta);
         modelo.addAttribute("movimientos", ultimosMovimientos);
 
         return "dashboard";

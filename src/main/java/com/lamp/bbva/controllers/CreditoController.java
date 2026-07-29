@@ -42,7 +42,13 @@ public class CreditoController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         List<SolicitudCreditoEntity> solicitudes = solicitudCreditoRepository.findByUsuarioOrderByFechaDesc(usuario);
 
+        String estadoCuenta = "ACTIVA";
+        if (usuario.getCuentas() != null && !usuario.getCuentas().isEmpty()) {
+            estadoCuenta = usuario.getCuentas().get(0).getEstado();
+        }
+
         modelo.addAttribute("solicitudes", solicitudes);
+        modelo.addAttribute("cuentaEstado", estadoCuenta);
         return "credito";
     }
 

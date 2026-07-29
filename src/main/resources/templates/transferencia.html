@@ -32,6 +32,18 @@
       </div>
 
       <div
+        th:if="${cuentaEstado == 'RETENIDA' or cuentaEstado == 'DESHABILITADA'}"
+        class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+          Tu cuenta se encuentra
+          <strong th:text="${#strings.toLowerCase(cuentaEstado)}">retenida</strong>.
+          No puedes enviar ni recibir transferencias mientras esté en este estado.
+        </div>
+      </div>
+
+      <div
         th:if="${param.exito}"
         class="alert alert-success d-flex align-items-center gap-2 mb-4"
       >
@@ -134,6 +146,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary-accent rounded-pill py-2 fw-bold"
+                  th:disabled="${cuentaEstado == 'RETENIDA' or cuentaEstado == 'DESHABILITADA'}"
                 >
                   <i class="bi bi-send-fill me-2"></i> Enviar Transferencia
                 </button>

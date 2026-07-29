@@ -33,14 +33,17 @@ public class TransferenciaController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         String clabe = "No asignada";
         Double saldo = 0.0;
+        String estadoCuenta = "ACTIVA";
 
         if (usuario.getCuentas() != null && !usuario.getCuentas().isEmpty()) {
             cuentaEntity cuentaPrincipal = usuario.getCuentas().get(0);
             clabe = cuentaPrincipal.getClabe();
             saldo = cuentaPrincipal.getSaldo();
+            estadoCuenta = cuentaPrincipal.getEstado();
         }
         modelo.addAttribute("cuentaClabe", clabe);
         modelo.addAttribute("saldoTotal", saldo);
+        modelo.addAttribute("cuentaEstado", estadoCuenta);
         return "transferencia";
     }
 
