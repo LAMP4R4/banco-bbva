@@ -65,11 +65,20 @@
                 >MXN
               </p>
               <p
-                class="small text-white-50 font-monospace mb-0"
+                class="small text-white-50 font-monospace mb-3"
                 th:text="'CLABE:'+${cuentaClabe}"
               >
                 CLABE: 1234567890
               </p>
+              <button
+                type="button"
+                class="btn btn-light btn-sm fw-bold"
+                data-bs-toggle="modal"
+                data-bs-target="#modalRetiro"
+                th:disabled="${cuentaEstado == 'RETENIDA' or cuentaEstado == 'DESHABILITADA'}"
+              >
+                <i class="bi bi-cash-stack me-1"></i>Retirar efectivo
+              </button>
             </div>
           </div>
 
@@ -129,6 +138,42 @@
               <p class="h5 fw-bold mb-0">
                 <i class="bi bi-check-circle-fill me-2"></i>No debes ningún crédito
               </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal de retiro de efectivo -->
+        <div class="modal fade" id="modalRetiro" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form th:action="@{/procesar-retiro}" method="POST">
+                <div class="modal-header">
+                  <h5 class="modal-title">Retirar efectivo</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  <p class="mb-2">
+                    Saldo disponible:
+                    <strong th:text="${'$' + #numbers.formatDecimal(saldoTotal, 1, 'COMMA', 2, 'POINT')}">$0.00</strong>
+                  </p>
+                  <label class="form-label">Monto a retirar</label>
+                  <input
+                    type="number"
+                    name="monto"
+                    class="form-control"
+                    step="0.01"
+                    min="0.01"
+                    th:max="${saldoTotal}"
+                    required
+                  />
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                  </button>
+                  <button type="submit" class="btn btn-primary">Confirmar retiro</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

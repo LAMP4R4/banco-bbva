@@ -116,6 +116,46 @@ public class BancaService {
         transferirMonto(clabeOrigen, clabeDestino, monto, descripcion);
     }
 
+    // Retiro de efectivo del cliente autenticado (sale de su cuenta, sin cuenta
+    // destino real, igual que un cajero automatico)
+    @Transactional(rollbackFor = Exception.class)
+    public void retirarEfectivo(String username, Double monto) {
+        if (monto == null || monto <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a cero.");
+        }
+
+        usuarioEntity usuario = usuarioRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+
+        if (usuario.getCuentas() == null || usuario.getCuentas().isEmpty()) {
+            throw new RuntimeException("El usuario no tiene una cuenta bancaria asignada.");
+        }
+
+        cuentaEntity cuenta = usuario.getCuentas().get(0);
+
+        if ("RETENIDA".equals(cuenta.getEstado()) || "DESHABILITADA".equals(cuenta.getEstado())) {
+            throw new RuntimeException("Tu cuenta está " + cuenta.getEstado().toLowerCase()
+                    + " y no puede realizar retiros.");
+        }
+
+        if (cuenta.getSaldo() < monto) {
+            throw new FondosInsuficientesException("No cuentas con saldo suficiente para este retiro.");
+        }
+
+        cuenta.setSaldo(cuenta.getSaldo() - monto);
+        cuentaRepository.save(cuenta);
+
+        movimientosEntity movimiento = new movimientosEntity();
+        movimiento.setCuentaOrigen(cuenta.getClabe());
+        movimiento.setCuentaDestino("RETIRO-EFECTIVO");
+        movimiento.setMonto(monto);
+        movimiento.setDescripcion("Retiro de efectivo");
+        movimiento.setTipo("Retiro");
+        movimiento.setEstadoMovimiento("AUTORIZADO");
+        movimiento.setFecha(LocalDate.now());
+        movimientoRepository.save(movimiento);
+    }
+
     // Registra un cliente y le asigna una CLABE aleatoria única de 18 dígitos
     @Transactional(rollbackFor = Exception.class)
     public usuarioEntity crearClienteConCuenta(String nombre, String username, String password, Double saldoInicial) {

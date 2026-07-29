@@ -236,6 +236,7 @@
                     <th class="text-center">ID</th>
                     <th class="text-center">Cliente</th>
                     <th class="text-center">Monto Solicitado</th>
+                    <th class="text-center">Saldo Pendiente</th>
                     <th class="text-center">Estado</th>
                     <th class="text-center">Fecha</th>
                     <th class="text-center">Acciones</th>
@@ -257,9 +258,15 @@
                       $0.00
                     </td>
                     <td class="text-center">
+                      <span th:if="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}"
+                        th:text="${'$' + #numbers.formatDecimal(solicitud.montoPendiente ?: solicitud.montoSolicitado, 1, 'COMMA', 2, 'POINT')}"
+                      >$0.00</span>
+                      <span th:unless="${solicitud.estado == 'APROBADO' or solicitud.estado == 'PAGADO'}">-</span>
+                    </td>
+                    <td class="text-center">
                       <span
                         class="badge"
-                        th:classappend="${solicitud.estado == 'APROBADO'} ? 'bg-success' : (${solicitud.estado == 'RECHAZADO'} ? 'bg-danger' : 'bg-warning text-dark')"
+                        th:classappend="${solicitud.estado == 'APROBADO'} ? 'bg-success' : (${solicitud.estado == 'RECHAZADO'} ? 'bg-danger' : (${solicitud.estado == 'PAGADO'} ? 'bg-primary' : 'bg-warning text-dark'))"
                         th:text="${solicitud.estado}"
                       >
                         PENDIENTE
@@ -296,7 +303,7 @@
                     </td>
                   </tr>
                   <tr th:if="${#lists.isEmpty(solicitudes)}">
-                    <td class="text-center text-muted" colspan="6">
+                    <td class="text-center text-muted" colspan="7">
                       Aún no hay solicitudes de crédito registradas.
                     </td>
                   </tr>

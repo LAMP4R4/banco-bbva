@@ -104,6 +104,16 @@ public class DashBoardController {
         return "dashboard";
     }
 
+    @PostMapping("/procesar-retiro")
+    public String procesarRetiro(@RequestParam Double monto, Authentication auth) {
+        try {
+            bancaService.retirarEfectivo(auth.getName(), monto);
+            return "redirect:/dashboard?exito=Retiro realizado con exito";
+        } catch (Exception e) {
+            return "redirect:/dashboard?error=" + e.getMessage();
+        }
+    }
+
     @GetMapping("/perfil")
     public String mostrarPerfil(Model modelo, Authentication auth) {
 
