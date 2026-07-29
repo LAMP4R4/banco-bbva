@@ -243,6 +243,32 @@ public class BancaService {
         return usuarioRepository.save(usuario);
     }
 
+    // El propio cliente actualiza su username, telefono, correo y
+    // opcionalmente su contraseña desde "Mi Perfil" (la contraseña solo se
+    // toca si viene no vacía)
+    @Transactional(rollbackFor = Exception.class)
+    public usuarioEntity actualizarPerfilPropio(String usernameActual, String nuevoUsername, String telefono,
+            String correo, String nuevaPassword) {
+        usuarioEntity usuario = usuarioRepository.findByUserName(usernameActual)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+
+        usuarioRepository.findByUserName(nuevoUsername)
+                .filter(u -> !u.getId().equals(usuario.getId()))
+                .ifPresent(u -> {
+                    throw new RuntimeException("El nombre de usuario ya está en uso.");
+                });
+
+        usuario.setUserName(nuevoUsername);
+        usuario.setTelefono(telefono);
+        usuario.setCorreo(correo);
+
+        if (nuevaPassword != null && !nuevaPassword.isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        }
+
+        return usuarioRepository.save(usuario);
+    }
+
     // Cambia el estado de la cuenta principal de un cliente (ACTIVA,
     // DESHABILITADA, RETENIDA)
     @Transactional(rollbackFor = Exception.class)

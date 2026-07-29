@@ -24,6 +24,22 @@
         </div>
       </div>
 
+      <div
+        th:if="${param.error}"
+        class="alert alert-danger d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div th:text="${param.error}">Error en la operación</div>
+      </div>
+
+      <div
+        th:if="${param.exito}"
+        class="alert alert-success d-flex align-items-center gap-2 mb-4"
+      >
+        <i class="bi bi-check-circle-fill"></i>
+        <div th:text="${param.exito}">Datos actualizados con éxito</div>
+      </div>
+
       <div class="row g-4">
         <!-- Datos personales -->
         <div class="col-12 col-lg-5">
@@ -58,7 +74,11 @@
                 <span class="text-secondary"
                   ><i class="bi bi-envelope me-2"></i>Correo</span
                 >
-                <span class="fw-semibold">cliente@correo.com</span>
+                <span
+                  class="fw-semibold"
+                  th:text="${usuario.correo != null and !usuario.correo.isEmpty()} ? ${usuario.correo} : 'No registrado'"
+                  >cliente@correo.com</span
+                >
               </li>
               <li
                 class="list-group-item d-flex justify-content-between align-items-center px-0"
@@ -66,7 +86,11 @@
                 <span class="text-secondary"
                   ><i class="bi bi-telephone me-2"></i>Teléfono</span
                 >
-                <span class="fw-semibold">55 0000 0000</span>
+                <span
+                  class="fw-semibold"
+                  th:text="${usuario.telefono != null and !usuario.telefono.isEmpty()} ? ${usuario.telefono} : 'No registrado'"
+                  >55 0000 0000</span
+                >
               </li>
               <li
                 class="list-group-item d-flex justify-content-between align-items-center px-0"
@@ -82,10 +106,10 @@
               <button
                 type="button"
                 class="btn btn-outline-secondary-accent rounded-pill fw-semibold"
-                disabled
+                data-bs-toggle="modal"
+                data-bs-target="#modalEditarPerfil"
               >
                 <i class="bi bi-pencil-square me-1"></i> Editar datos
-                (próximamente)
               </button>
             </div>
           </div>
@@ -125,6 +149,55 @@
                 Aún no tienes cuentas asociadas.
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal: editar mis datos -->
+      <div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form th:action="@{/perfil/editar}" method="POST">
+              <div class="modal-header">
+                <h5 class="modal-title">Editar mis datos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Nombre de usuario</label>
+                  <input type="text" name="username" class="form-control" th:value="${usuario.userName}" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Correo</label>
+                  <input type="email" name="correo" class="form-control" th:value="${usuario.correo}" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Teléfono</label>
+                  <input type="tel" name="telefono" class="form-control" th:value="${usuario.telefono}" />
+                </div>
+                <hr />
+                <p class="text-secondary small mb-2">
+                  Deja la contraseña en blanco si no quieres cambiarla.
+                </p>
+                <div class="mb-3">
+                  <label class="form-label">Nueva contraseña</label>
+                  <input type="password" name="password" class="form-control" autocomplete="new-password" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Confirmar nueva contraseña</label>
+                  <input type="password" name="confirmarPassword" class="form-control" autocomplete="new-password" />
+                </div>
+                <p class="text-secondary small mb-0">
+                  Al guardar se cerrará tu sesión y deberás volver a iniciar sesión.
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Cancelar
+                </button>
+                <button type="submit" class="btn-banco">Guardar cambios</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

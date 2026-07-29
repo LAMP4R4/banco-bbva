@@ -8,22 +8,31 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.lamp.bbva.entity.cuentaEntity;
 import com.lamp.bbva.entity.movimientosEntity;
 import com.lamp.bbva.entity.usuarioEntity;
 import com.lamp.bbva.repository.movimientoCuentaRepository;
 import com.lamp.bbva.repository.usuarioRepository;
+import com.lamp.bbva.service.BancaService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class DashBoardController {
 
     private final usuarioRepository usuarioRepository;
     private final movimientoCuentaRepository movimientoCuentaRepository;
+    private final BancaService bancaService;
 
-    public DashBoardController(usuarioRepository usuario, movimientoCuentaRepository movimientoCuenta) {
+    public DashBoardController(usuarioRepository usuario, movimientoCuentaRepository movimientoCuenta,
+            BancaService bancaService) {
         this.usuarioRepository = usuario;
         this.movimientoCuentaRepository = movimientoCuenta;
+        this.bancaService = bancaService;
     }
 
     @GetMapping("/")
@@ -90,6 +99,36 @@ public class DashBoardController {
         modelo.addAttribute("cuentas", cuentas);
 
         return "perfil";
+    }
+
+    // El cliente edita su propio username, telefono, correo y (opcionalmente)
+    // contraseña. Como username/password son las credenciales de la sesión,
+    // al terminar se invalida la sesión y se manda a login para que vuelva a
+    // autenticarse.
+    @PostMapping("/perfil/editar")
+    public String editarPerfil(@RequestParam String username, @RequestParam(required = false) String telefono,
+            @RequestParam(required = false) String correo, @RequestParam(required = false) String password,
+            @RequestParam(required = false) String confirmarPassword, Authentication auth,
+            HttpServletRequest request, RedirectAttributes redirectAttributes) {
+
+        if (auth == null) {
+            return "redirect:/login";
+        }
+
+        if (password != null && !password.isBlank() && !password.equals(confirmarPassword)) {
+            redirectAttributes.addAttribute("error", "Las contraseñas no coinciden");
+            return "redirect:/perfil";
+        }
+
+        try {
+            bancaService.actualizarPerfilPropio(auth.getName(), username, telefono, correo, password);
+            request.getSession().invalidate();
+            redirectAttributes.addAttribute("exito", "Datos actualizados, vuelve a iniciar sesión");
+            return "redirect:/login";
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", e.getMessage());
+            return "redirect:/perfil";
+        }
     }
 
 }

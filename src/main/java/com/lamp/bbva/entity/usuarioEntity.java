@@ -29,6 +29,8 @@ public class usuarioEntity {
     private String password;
     @Column(nullable = false)
     private String rol;
+    private String correo;
+    private String telefono;
 
     // relacion con muchas cuentas
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

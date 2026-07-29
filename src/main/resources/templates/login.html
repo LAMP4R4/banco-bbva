@@ -39,6 +39,13 @@
         <i class="fa-solid fa-circle-check fs-5"></i>
         <div>Has cerrado sesión correctamente.</div>
       </div>
+      <div
+        th:if="${param.exito}"
+        class="alert alert-custom-success d-flex align-items-center"
+      >
+        <i class="fa-solid fa-circle-check fs-5"></i>
+        <div th:text="${param.exito}">Datos actualizados</div>
+      </div>
 
       <form th:action="@{/login}" method="POST" class="needs-validation">
         <div class="mb-3">
