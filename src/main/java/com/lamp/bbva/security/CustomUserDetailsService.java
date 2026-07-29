@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lamp.bbva.entity.cuentaEntity;
 import com.lamp.bbva.entity.usuarioEntity;
@@ -21,6 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {
         usuarioEntity usuarioLogin = usuarioRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No se encontro el cliente"));
