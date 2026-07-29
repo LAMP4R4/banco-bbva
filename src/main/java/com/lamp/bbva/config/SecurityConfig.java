@@ -2,11 +2,13 @@ package com.lamp.bbva.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +38,20 @@ public class SecurityConfig {
                         // el formulario envia el campo "userName", no el "username" por defecto
                         .usernameParameter("userName")
                         .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/login?error=true")
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error=true") {
+                            @Override
+                            public void onAuthenticationFailure(jakarta.servlet.http.HttpServletRequest request,
+                                    jakarta.servlet.http.HttpServletResponse response,
+                                    org.springframework.security.core.AuthenticationException exception)
+                                    throws java.io.IOException, jakarta.servlet.ServletException {
+                                if (exception instanceof DisabledException) {
+                                    setDefaultFailureUrl("/login?disabled=true");
+                                } else {
+                                    setDefaultFailureUrl("/login?error=true");
+                                }
+                                super.onAuthenticationFailure(request, response, exception);
+                            }
+                        })
                         .permitAll()
 
                 )

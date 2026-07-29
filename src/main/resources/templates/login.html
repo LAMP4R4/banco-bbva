@@ -33,6 +33,13 @@
         <div>Usuario o contraseña incorrectos.</div>
       </div>
       <div
+        th:if="${param.disabled}"
+        class="alert alert-custom-danger d-flex align-items-center"
+      >
+        <i class="fa-solid fa-circle-exclamation fs-5"></i>
+        <div>Tu cuenta se encuentra deshabilitada. Contacta al banco para más información.</div>
+      </div>
+      <div
         th:if="${param.logout}"
         class="alert alert-custom-success d-flex align-items-center"
       >

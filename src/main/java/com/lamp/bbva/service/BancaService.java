@@ -59,6 +59,12 @@ public class BancaService {
         cuentaEntity destino = cuentaRepository.findByClabe(clabeDestino)
                 .orElseThrow(() -> new RuntimeException("La cuenta de destino no existe."));
 
+        // Una cuenta retenida o deshabilitada no puede enviar transferencias
+        if ("RETENIDA".equals(origen.getEstado()) || "DESHABILITADA".equals(origen.getEstado())) {
+            throw new RuntimeException("Tu cuenta está " + origen.getEstado().toLowerCase()
+                    + " y no puede realizar transferencias.");
+        }
+
         // Validar fondos del remitente
         if (origen.getSaldo() < monto) {
             throw new FondosInsuficientesException("No cuentas con saldo suficiente para esta operación.");
@@ -150,6 +156,14 @@ public class BancaService {
             throw new RuntimeException("Solo los clientes pueden solicitar créditos.");
         }
 
+        if (usuario.getCuentas() != null && !usuario.getCuentas().isEmpty()) {
+            String estadoCuenta = usuario.getCuentas().get(0).getEstado();
+            if ("RETENIDA".equals(estadoCuenta) || "DESHABILITADA".equals(estadoCuenta)) {
+                throw new RuntimeException("Tu cuenta está " + estadoCuenta.toLowerCase()
+                        + " y no puede solicitar créditos.");
+            }
+        }
+
         SolicitudCreditoEntity solicitud = new SolicitudCreditoEntity();
         solicitud.setUsuario(usuario);
         solicitud.setMontoSolicitado(monto);
@@ -186,7 +200,7 @@ public class BancaService {
         movimiento.setCuentaDestino(cuenta.getClabe());
         movimiento.setMonto(solicitud.getMontoSolicitado());
         movimiento.setEstadoMovimiento("AUTORIZADO");
-        movimiento.setTipo("Deposito");
+        movimiento.setTipo("Credito");
         movimiento.setDescripcion("Abono de crédito aprobado - Solicitud #" + solicitudId);
         movimiento.setFecha(LocalDate.now());
         movimientoRepository.save(movimiento);

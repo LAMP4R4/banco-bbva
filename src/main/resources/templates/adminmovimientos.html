@@ -95,11 +95,11 @@
                     <td class="text-center">
                       <span
                         class="badge"
-                        th:classappend="${movimiento.tipo == 'Deposito'} ? 'badge-deposito' : 'badge-transferencia'"
+                        th:classappend="${movimiento.tipo == 'Deposito' or movimiento.tipo == 'Credito'} ? 'badge-deposito' : 'badge-transferencia'"
                       >
                         <i
                           class="bi"
-                          th:classappend="${movimiento.tipo == 'Deposito'} ? 'bi-piggy-bank' : 'bi-arrow-left-right'"
+                          th:classappend="${movimiento.tipo == 'Deposito' or movimiento.tipo == 'Credito'} ? 'bi-piggy-bank' : 'bi-arrow-left-right'"
                         ></i>
                         <span th:text="${movimiento.tipo}">Deposito</span>
                       </span>
@@ -109,8 +109,8 @@
                     </td>
                     <td
                       class="text-end fw-bold"
-                      th:classappend="${movimiento.tipo == 'Deposito'} ? 'text-success' : 'text-danger'"
-                      th:text="${(movimiento.tipo == 'Deposito' ? '+$' : '-$')} + ${#numbers.formatDecimal(movimiento.monto, 1, 'COMMA', 2, 'POINT')}"
+                      th:classappend="${movimiento.tipo == 'Deposito' or movimiento.tipo == 'Credito'} ? 'text-success' : 'text-danger'"
+                      th:text="${((movimiento.tipo == 'Deposito' or movimiento.tipo == 'Credito') ? '+$' : '-$')} + ${#numbers.formatDecimal(movimiento.monto, 1, 'COMMA', 2, 'POINT')}"
                     >
                       +$0.00
                     </td>
